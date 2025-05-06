@@ -1,1 +1,5 @@
+# Cache de Python
 __pycache__/
+
+# Ficheiros do sistema
+.DS_Store
