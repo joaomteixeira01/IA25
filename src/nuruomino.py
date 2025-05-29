@@ -432,24 +432,22 @@ if __name__ == "__main__":
     print(f"\nValores adjacentes à célula ({row}, {col}):")
     print(board.adjacent_values(row, col))
 
+    # Aplica automaticamente peças em todas as regiões com 4 células
     problem = Nuruomino(board)
-    initial_state = NuruominoState(board)
+    state = NuruominoState(board)
+    for region_id in problem.regions:
+        region_cells = board.get_region_positions(region_id)
+        if len(region_cells) == 4 and all(board.get_value(i, j).isdigit() for (i, j) in region_cells):
+            # Procura uma ação válida para esta região
+            for action in problem.actions(state):
+                if action[0] == region_id:
+                    print(f"A aplicar na região {region_id}: {action}")
+                    state = problem.result(state, action)
+                    board = state.board  # Atualiza o board para os próximos passos
+                    break
 
-    print("\nAções válidas no estado inicial:")
-    for action in problem.actions(initial_state):
-        region_id, piece, shape, index = action
-        print(f"Região {region_id} → peça {piece} com forma {shape}")
-
-    print("\nTestar result(): aplicar primeira ação possível")
-    actions = problem.actions(initial_state)
-    if actions:
-        action = actions[0]
-        print("Ação aplicada:", action)
-        new_state = problem.result(initial_state, action)
-        print("Novo estado do tabuleiro:")
-        new_state.board.print_instance()
-    else:
-        print("Nenhuma ação disponível.")
+    print("\nTabuleiro após preencher todas as regiões de 4 células:")
+    board.print_instance()
     
     # instrumented = InstrumentedProblem(problem)
     # goal_node = astar_search(instrumented)
