@@ -345,9 +345,8 @@ class Nuruomino(Problem):
                 self._is_connected(board) and 
                 self._no_same_piece_adjacent(board))
 
-    def h(self, node: Node):
+    '''def h(self, node: Node):
         """Função heuristica utilizada para a procura A*."""
-        ''' 
         board = node.state.board
         score = 0
 
@@ -380,6 +379,42 @@ class Nuruomino(Problem):
                     score += (4 - free_adj) ** 2  # Penalização quadrática
 
         return score'''
+    
+    # def h(self, node: Node):
+    #     board = node.state.board
+    #     score = 0
+
+    #     # 1. Penaliza regiões não preenchidas (prioridade máxima)
+    #     unfinished_regions = sum(
+    #         1 for region_id in self.regions
+    #         if any(board.get_value(i, j).isdigit() for (i, j) in board.get_region_positions(region_id))
+    #     )
+    #     score += unfinished_regions * 20  # Peso alto
+
+    #     # 2. Penaliza desconexão (prioridade alta)
+    #     if not self._is_connected(board):
+    #         score += 50
+
+    #     # 3. Penaliza blocos 2x2 (prioridade alta)
+    #     if not self._has_no_2x2_blocks(board):
+    #         score += 40
+
+    #     # 4. Penaliza peças iguais adjacentes (prioridade média)
+    #     if not self._no_same_piece_adjacent(board):
+    #         score += 30
+
+    #     # 5. Penaliza cantos 'X' com vizinhos não preenchidos (prioridade baixa)
+    #     for i in range(board.n):
+    #         for j in range(board.n):
+    #             if board.get_value(i, j) == 'X':
+    #                 adj_digits = sum(
+    #                     1 for (ni, nj) in board.adjacent_positions(i, j)
+    #                     if board.get_value(ni, nj).isdigit()
+    #                 )
+    #                 if adj_digits > 0:
+    #                     score += 5 * adj_digits
+
+    #     return score
 
 
 if __name__ == "__main__":
@@ -416,12 +451,12 @@ if __name__ == "__main__":
     else:
         print("Nenhuma ação disponível.")
     
-    '''instrumented = InstrumentedProblem(problem)
-    goal_node = astar_search(instrumented)
-    print(f"Nós gerados: {instrumented.states}")
-    print(f"Nós expandidos: {instrumented.succs}")
-    if goal_node:
-        print("\nSolução encontrada:")
-        goal_node.state.board.print_instance()
-    else:
-        print("Nenhuma solução encontrada.")'''
+    # instrumented = InstrumentedProblem(problem)
+    # goal_node = astar_search(instrumented)
+    # print(f"Nós gerados: {instrumented.states}")
+    # print(f"Nós expandidos: {instrumented.succs}")
+    # if goal_node:
+    #     print("\nSolução encontrada:")
+    #     goal_node.state.board.print_instance()
+    # else:
+    #     print("Nenhuma solução encontrada.")
