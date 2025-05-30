@@ -42,13 +42,13 @@ TETRAMINOS = {
 CORNER_OFFSETS = {
     'L': [
         [(1, 1)],  # [(0,0), (1,0), (2,0), (2,1)]
-        [(1, 0)],  # [(0,0), (0,1), (0,2), (1,0)]
-        [(1, 0)],  # [(0,0), (0,1), (1,1), (2,1)]
-        [(0, 0)],  # [(0,2), (1,0), (1,1), (1,2)]
+        [(1, 1)],  # [(0,0), (0,1), (0,2), (1,0)]
+        [(0, 1)],  # [(0,0), (0,1), (1,1), (2,1)]
+        [(0, 1)],  # [(0,2), (1,0), (1,1), (1,2)]
         [(1, 1)],  # [(0,0), (0,1), (1,0), (2,0)]
-        [(1, 2)],  # [(0,0), (0,1), (0,2), (1,2)]
-        [(2, 0)],  # [(0,1), (1,1), (2,0), (2,1)]
-        [(1, 0)],  # [(0,0), (1,0), (1,1), (1,2)]
+        [(1, 1)],  # [(0,0), (0,1), (0,2), (1,2)]
+        [(1, 0)],  # [(0,1), (1,1), (2,0), (2,1)]
+        [(0, 1)],  # [(0,0), (1,0), (1,1), (1,2)]
     ],
     'T': [
         [(1, 0), (1, 2)],  # [(0,0), (0,1), (0,2), (1,1)]
@@ -222,12 +222,17 @@ class Nuruomino(Problem):
                 continue
 
             for piece_letter, shapes in TETRAMINOS.items():
-                for shape in shapes:
-                    if self.is_valid_placement_on_board(board, region_id, shape):
-                        actions.append((region_id, piece_letter, shape, shapes.index(shape)))
+                for index, shape in enumerate(shapes):
+                    for origin in region_cells:
+                        shape_abs = [(origin[0] + dx, origin[1] + dy) for dx, dy in shape]
+                        if all(pos in region_cells and board.get_value(pos[0], pos[1]).isdigit() for pos in shape_abs):
+                            if self._would_create_2x2_block(shape_abs, board):
+                                continue
+                            if self._would_touch_equal_piece(shape_abs, piece_letter, board):
+                                continue
+                            actions.append((region_id, piece_letter, shape, index, shape_abs))
 
         return actions
-
 
     def result(self, state: NuruominoState, action):
         """Retorna o estado resultante de executar a 'action' sobre
@@ -236,7 +241,8 @@ class Nuruomino(Problem):
         self.actions(state)."""
 
         import copy
-        region_id, piece_letter, shape, index = action
+        #region_id, piece_letter, shape, index = action
+        region_id, piece_letter, shape, index, shape_abs = action
 
         new_board_data = copy.deepcopy(state.board.board)
         region_cells = state.board.get_region_positions(region_id)
@@ -334,6 +340,26 @@ class Nuruomino(Problem):
                                 return False
         return True
 
+    def _would_create_2x2_block(self, positions, board):
+        for (i, j) in positions:
+            for di in [0, -1]:
+                for dj in [0, -1]:
+                    square = [(i+di, j+dj), (i+di+1, j+dj), (i+di, j+dj+1), (i+di+1, j+dj+1)]
+                    if all(0 <= x < board.n and 0 <= y < board.n and board.get_value(x, y) in "LITS"
+                        for (x, y) in square):
+                        return True
+        return False
+
+    def _would_touch_equal_piece(self, positions, piece_letter, board):
+        for (i, j) in positions:
+            for (ni, nj) in board.adjacent_positions(i, j):
+                if (ni, nj) not in positions:
+                    val = board.get_value(ni, nj)
+                    if val == piece_letter:
+                        return True
+        return False
+
+
         
     def goal_test(self, state: NuruominoState):
         """Retorna True se e só se o estado passado como argumento é
@@ -416,25 +442,69 @@ class Nuruomino(Problem):
 
     #     return score
 
+    def h(self, node: Node):
+        board = node.state.board
+        h_n = 0
+
+        # Conta o número de regiões ainda não preenchidas
+        incomplete_regions = 0
+        for region_id in self.regions:
+            region_cells = board.get_region_positions(region_id)
+            if any(board.get_value(i, j).isdigit() for (i, j) in region_cells):
+                incomplete_regions += 1
+
+        h_n += incomplete_regions * 10  # encoraja a resolver regiões cedo
+
+        # Penaliza células vazias com menos vizinhos livres (pontos de bloqueio)
+        for i in range(board.n):
+            for j in range(board.n):
+                if board.get_value(i, j).isdigit():
+                    free_adj = sum(
+                        1 for (ni, nj) in board.adjacent_positions(i, j)
+                        if board.get_value(ni, nj).isdigit()
+                    )
+                    if free_adj <= 1:
+                        h_n += 10  # beco sem saída
+
+        # Verifica só se o estado está quase completo
+        filled = sum(
+            1 for i in range(board.n) for j in range(board.n)
+            if board.get_value(i, j) in "LITS"
+        )
+        total = board.n * board.n
+        ratio = filled / total
+
+        if ratio >= 0.75:
+            # Corta se houver blocos 2x2
+            if not self._has_no_2x2_blocks(board):
+                return float('inf')
+
+            # Corta se peças iguais estiverem ortogonalmente adjacentes
+            if not self._no_same_piece_adjacent(board):
+                return float('inf')
+
+            # Corta se peças não estiverem ligadas (nurilkabe inválido)
+            if not self._is_connected(board):
+                return float('inf')
+
+        return h_n
+
 
 if __name__ == "__main__":
     board = Board.parse_instance()
+
     print("Grelha lida do input:")
     board.print_instance()
 
-    print("\nRegiões adjacentes à região 3:")
-    print(board.adjacent_regions(3))
-
-    row, col = 2, 3
-    print(f"\nPosições adjacentes à célula ({row}, {col}):")
-    print(board.adjacent_positions(row, col))
-
-    print(f"\nValores adjacentes à célula ({row}, {col}):")
-    print(board.adjacent_values(row, col))
-
-    # Aplica automaticamente peças em todas as regiões com 4 células
     problem = Nuruomino(board)
     state = NuruominoState(board)
+
+    print("\nNúmero de células por região:")
+    for region_id in problem.regions:
+        positions = board.get_region_positions(region_id)
+        print(f" - Região {region_id}: {len(positions)} células")
+
+    # Aplica automaticamente peças em todas as regiões com 4 células
     for region_id in problem.regions:
         region_cells = board.get_region_positions(region_id)
         if len(region_cells) == 4 and all(board.get_value(i, j).isdigit() for (i, j) in region_cells):
@@ -448,13 +518,18 @@ if __name__ == "__main__":
 
     print("\nTabuleiro após preencher todas as regiões de 4 células:")
     board.print_instance()
+
+    print("\nAções válidas no estado atual:")
+    for action in problem.actions(state):
+        region_id, piece, shape, index, shape_abs = action
+        print(f"Região {region_id} → peça {piece} com forma {shape} na posição {shape_abs}")
     
-    # instrumented = InstrumentedProblem(problem)
-    # goal_node = astar_search(instrumented)
-    # print(f"Nós gerados: {instrumented.states}")
-    # print(f"Nós expandidos: {instrumented.succs}")
-    # if goal_node:
-    #     print("\nSolução encontrada:")
-    #     goal_node.state.board.print_instance()
-    # else:
-    #     print("Nenhuma solução encontrada.")
+    instrumented = InstrumentedProblem(problem)
+    goal_node = astar_search(instrumented)
+    print(f"Nós gerados: {instrumented.states}")
+    print(f"Nós expandidos: {instrumented.succs}")
+    if goal_node:
+        print("\nSolução encontrada:")
+        goal_node.state.board.print_instance()
+    else:
+        print("Nenhuma solução encontrada.")
