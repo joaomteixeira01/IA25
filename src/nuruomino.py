@@ -64,6 +64,8 @@ CORNER_OFFSETS = {
     ]
 }
 
+LAST_STATES = []
+
 
 class NuruominoState:
     state_id = 0
@@ -211,21 +213,23 @@ class Nuruomino(Problem):
         actions = []
         board = state.board
 
-        # Priorizar regiões com exatamente 4 células
+        # Podes priorizar regiões com 4 células, mas isso não deve impedir outras
         regions_sorted = sorted(self.regions, key=lambda r: len(board.get_region_positions(r)) != 4)
 
         for region_id in regions_sorted:
             region_cells = board.get_region_positions(region_id)
 
-            # Se a região já estiver preenchida com uma peça, ignora
-            if not all(board.get_value(i, j).isdigit() for (i, j) in region_cells):
-                continue
-
             for piece_letter, shapes in TETRAMINOS.items():
                 for index, shape in enumerate(shapes):
                     for origin in region_cells:
                         shape_abs = [(origin[0] + dx, origin[1] + dy) for dx, dy in shape]
-                        if all(pos in region_cells and board.get_value(pos[0], pos[1]).isdigit() for pos in shape_abs):
+
+                        # Verifica se a peça encaixa na própria região e em células ainda disponíveis
+                        if all(
+                            pos in region_cells and
+                            board.get_value(pos[0], pos[1]) not in "LITS?"  # pode ser número ou '?'
+                            for pos in shape_abs
+                        ):
                             if self._would_create_2x2_block(shape_abs, board):
                                 continue
                             if self._would_touch_equal_piece(shape_abs, piece_letter, board):
@@ -241,45 +245,45 @@ class Nuruomino(Problem):
         self.actions(state)."""
 
         import copy
-        #region_id, piece_letter, shape, index = action
         region_id, piece_letter, shape, index, shape_abs = action
 
         new_board_data = copy.deepcopy(state.board.board)
-        region_cells = state.board.get_region_positions(region_id)
 
-        for origin in region_cells:
-            shape_abs = [(origin[0] + dx, origin[1] + dy) for dx, dy in shape]
+        # Aplica a peça diretamente nas posições definidas
+        for i, j in shape_abs:
+            new_board_data[i][j] = piece_letter
 
-            if all(pos in region_cells for pos in shape_abs):
-                # Verificar se alguma célula da peça iria cobrir um 'X'
-                if any(new_board_data[i][j] == 'X' for (i, j) in shape_abs):
-                    continue  # Ignora esta tentativa
+        if piece_letter in CORNER_OFFSETS:
+            corner_offsets = CORNER_OFFSETS[piece_letter][index]
+            # Encontrar a origem relativa da peça (a posição que corresponde ao (0,0) da shape original)
+            origin_i = shape_abs[0][0] - shape[0][0]
+            origin_j = shape_abs[0][1] - shape[0][1]
+            for offset_i, offset_j in corner_offsets:
+                ci = origin_i + offset_i
+                cj = origin_j + offset_j
+                if 0 <= ci < len(new_board_data) and 0 <= cj < len(new_board_data[0]):
+                    if new_board_data[ci][cj].isdigit():
+                        new_board_data[ci][cj] = 'X'
 
-                # Aplicar a peça
-                for i, j in shape_abs:
-                    new_board_data[i][j] = piece_letter
+        # Criar novo tabuleiro e novo estado
+        new_board = Board(new_board_data)
 
-                # Marcar os cantos, se houver
-                if piece_letter in CORNER_OFFSETS:
-                    corner_offsets = CORNER_OFFSETS[piece_letter][index]
-                    for corner_offset in corner_offsets:
-                        ci, cj = origin[0] + corner_offset[0], origin[1] + corner_offset[1]
-                        if 0 <= ci < len(new_board_data) and 0 <= cj < len(new_board_data[0]):
-                            if new_board_data[ci][cj].isdigit():
-                                new_board_data[ci][cj] = 'X'
+        # Adiciona esta linha ANTES de retornar o estado
+        LAST_STATES.append(new_board)
 
-                # Criar novo tabuleiro e novo estado
-                new_board = Board(new_board_data)
-                return NuruominoState(new_board)
-
-        raise ValueError(f"Ação inválida: peça {piece_letter} não encaixa na região {region_id}")
+        # Opcional: mantém só os últimos 10
+        if len(LAST_STATES) > 10:
+            LAST_STATES.pop(0)
+        return NuruominoState(new_board)
 
     # Game rules 
-    def _all_filled_with_pieces(self, board):
-        for row in board.board:
-            for cell in row:
-                if cell.isdigit():
-                    return False
+    def _all_regions_have_one_piece(self, board):
+        """Verifica se cada região tem exatamente uma peça tetraminó colocada (4 células com letra)."""
+        for region_id in self.regions:
+            region_cells = board.get_region_positions(region_id)
+            piece_cells = [board.get_value(i, j) for (i, j) in region_cells if board.get_value(i, j) in "LITS"]
+            if len(piece_cells) != 4:
+                return False
         return True
 
     def _has_no_2x2_blocks(self, board):
@@ -295,12 +299,17 @@ class Nuruomino(Problem):
                     return False
         return True
 
-    def _is_connected(self, board):
+    def _is_connected(self, board, debug=False):
         from collections import deque
+
+        def orthogonal_neighbors(i, j):
+            return [(i-1, j), (i+1, j), (i, j-1), (i, j+1)]
 
         visited = set()
         queue = deque()
+        piece_connections = set()
 
+        # Encontrar a primeira célula preenchida com peça
         for i in range(board.n):
             for j in range(board.n):
                 if board.get_value(i, j) in "LITS":
@@ -312,10 +321,21 @@ class Nuruomino(Problem):
 
         while queue:
             i, j = queue.popleft()
-            for ni, nj in board.adjacent_positions(i, j):
-                if board.get_value(ni, nj) in "LITS" and (ni, nj) not in visited:
-                    visited.add((ni, nj))
-                    queue.append((ni, nj))
+            current_piece = board.get_value(i, j)
+
+            for ni, nj in orthogonal_neighbors(i, j):
+                if 0 <= ni < board.n and 0 <= nj < board.n:
+                    neighbor_val = board.get_value(ni, nj)
+
+                    if neighbor_val in "LITS":
+                        # Adiciona a ligação entre peças diferentes
+                        if neighbor_val != current_piece:
+                            connection = tuple(sorted([current_piece, neighbor_val]))
+                            piece_connections.add(connection)
+
+                        if (ni, nj) not in visited:
+                            visited.add((ni, nj))
+                            queue.append((ni, nj))
 
         total_filled = sum(
             1 for i in range(board.n)
@@ -323,7 +343,14 @@ class Nuruomino(Problem):
             if board.get_value(i, j) in "LITS"
         )
 
+        if debug:
+            print(f"\n[DEBUG] Peças conectadas ortogonalmente:")
+            for a, b in sorted(piece_connections):
+                print(f"  → {a} conectado a {b}")
+            print(f"Total de peças conectadas: {len(visited)} / {total_filled}")
+
         return len(visited) == total_filled
+
 
     def _no_same_piece_adjacent(self, board):
         for i in range(board.n):
@@ -335,9 +362,7 @@ class Nuruomino(Problem):
                     if 0 <= ni < board.n and 0 <= nj < board.n:
                         neighbor = board.get_value(ni, nj)
                         if neighbor == current:
-                            # Verifica se pertencem a regiões diferentes
-                            if board.board[i][j] != board.board[ni][nj]:
-                                return False
+                            return False
         return True
 
     def _would_create_2x2_block(self, positions, board):
@@ -366,7 +391,7 @@ class Nuruomino(Problem):
         um estado objetivo. Deve verificar se todas as posições do tabuleiro
         estão preenchidas de acordo com as regras do problema."""
         board = state.board
-        return (self._all_filled_with_pieces(board) and 
+        return (self._all_regions_have_one_piece(board) and 
                 self._has_no_2x2_blocks(board) and 
                 self._is_connected(board) and 
                 self._no_same_piece_adjacent(board))
@@ -489,6 +514,74 @@ class Nuruomino(Problem):
 
         return h_n
 
+def preenche_regioes_de_4_celulas(board: Board, problem: Nuruomino) -> Board:
+    import copy
+
+    new_board = copy.deepcopy(board)
+
+    for region_id in problem.regions:
+        region_cells = new_board.get_region_positions(region_id)
+        if len(region_cells) == 4 and all(new_board.get_value(i, j).isdigit() or new_board.get_value(i, j) == '?' for (i, j) in region_cells):
+            # Criamos um estado temporário para gerar ações
+            temp_state = NuruominoState(new_board)
+            actions = problem.actions(temp_state)
+            for action in actions:
+                if action[0] == region_id:
+                    print(f"A aplicar na região {region_id}: {action}")
+                    temp_state = problem.result(temp_state, action)
+                    new_board = temp_state.board
+                    break
+
+    return new_board
+
+def marcar_celulas_comuns(board: Board, problem: Nuruomino):
+    """Marca no tabuleiro as células que são comuns a todas as ações possíveis por região."""
+    state = NuruominoState(board)
+    acoes = problem.actions(state)
+
+    from collections import defaultdict
+    regioes_shapes = defaultdict(list)
+
+    # Agrupar as formas por região
+    for (reg_id, piece_letter, shape, index, shape_abs) in acoes:
+        regioes_shapes[reg_id].append(set(shape_abs))
+
+    for reg_id, lista_de_posicoes in regioes_shapes.items():
+        if not lista_de_posicoes:
+            continue
+        
+        # Interseção de todas as posições possíveis
+        comuns = set.intersection(*lista_de_posicoes)
+
+        # Marcar as posições comuns no board (ex: com '?')
+        for (i, j) in comuns:
+            val = board.get_value(i, j)
+            if val.isdigit():  # só marcamos se estiver ainda por preencher
+                board.board[i][j] = '?'
+    marcar_cantos_comuns_invalidos(board)
+
+
+def marcar_cantos_comuns_invalidos(board: Board):
+    """Marca com 'X' todas as células que, se preenchidas, formariam blocos 2x2 com 'letras' ou '?'."""
+    for i in range(board.n - 1):
+        for j in range(board.n - 1):
+            square = [
+                (i, j), (i+1, j), (i, j+1), (i+1, j+1)
+            ]
+
+            letras_ou_certas = []
+            digitos = []
+
+            for (x, y) in square:
+                val = board.get_value(x, y)
+                if val in "LITS?":
+                    letras_ou_certas.append((x, y))
+                elif val.isdigit():
+                    digitos.append((x, y))
+
+            if len(letras_ou_certas) == 3 and len(digitos) == 1:
+                (dx, dy) = digitos[0]
+                board.board[dx][dy] = 'X'
 
 if __name__ == "__main__":
     board = Board.parse_instance()
@@ -497,33 +590,40 @@ if __name__ == "__main__":
     board.print_instance()
 
     problem = Nuruomino(board)
-    state = NuruominoState(board)
+    #state = NuruominoState(board)
 
     print("\nNúmero de células por região:")
     for region_id in problem.regions:
         positions = board.get_region_positions(region_id)
         print(f" - Região {region_id}: {len(positions)} células")
 
-    # Aplica automaticamente peças em todas as regiões com 4 células
-    for region_id in problem.regions:
-        region_cells = board.get_region_positions(region_id)
-        if len(region_cells) == 4 and all(board.get_value(i, j).isdigit() for (i, j) in region_cells):
-            # Procura uma ação válida para esta região
-            for action in problem.actions(state):
-                if action[0] == region_id:
-                    print(f"A aplicar na região {region_id}: {action}")
-                    state = problem.result(state, action)
-                    board = state.board  # Atualiza o board para os próximos passos
-                    break
+    # Aplicamos peças nas regiões com 4 células
+    board = preenche_regioes_de_4_celulas(board, problem)
 
     print("\nTabuleiro após preencher todas as regiões de 4 células:")
     board.print_instance()
 
     print("\nAções válidas no estado atual:")
+    state_temp = NuruominoState(board)
+    for action in problem.actions(state_temp):
+        region_id, piece, shape, index, shape_abs = action
+        print(f"Região {region_id} → peça {piece} com forma {shape} na posição {shape_abs}")
+
+    # Marcar células deduzidas por interseção de possibilidades
+    print("\nMarcar células comuns nas regiões restantes:")
+    marcar_celulas_comuns(board, problem)
+    board.print_instance()
+
+    # Criamos o novo estado inicial com as peças já aplicadas
+    state = NuruominoState(board)
+    problem = Nuruomino(board)  # novo problem com board atualizado
+    problem.initial = state
+
+    print("\nAções válidas no estado atual:")
     for action in problem.actions(state):
         region_id, piece, shape, index, shape_abs = action
         print(f"Região {region_id} → peça {piece} com forma {shape} na posição {shape_abs}")
-    
+
     instrumented = InstrumentedProblem(problem)
     goal_node = astar_search(instrumented)
     print(f"Nós gerados: {instrumented.states}")
@@ -533,3 +633,99 @@ if __name__ == "__main__":
         goal_node.state.board.print_instance()
     else:
         print("Nenhuma solução encontrada.")
+
+    '''print("\nÚltimos 10 estados gerados:")
+    for idx, b in enumerate(LAST_STATES):
+        print(f"\nEstado {idx+1}:")
+        b.print_instance()'''
+
+    '''def debug_goal_test_details(problem):
+        print("\n[DEBUG] Diagnóstico do `goal_test` nos últimos 10 estados:")
+
+        for idx, board in enumerate(LAST_STATES):
+            print(f"\nEstado {idx + 1}:")
+            board.print_instance()
+            state = NuruominoState(board)
+
+            all_pieces = problem._all_regions_have_one_piece(board)
+            no_2x2 = problem._has_no_2x2_blocks(board)
+            connected = problem._is_connected(board)
+            no_adj = problem._no_same_piece_adjacent(board)
+
+            if all([all_pieces, no_2x2, connected, no_adj]):
+                print("  goal_test: TRUE — Estado objetivo atingido.")
+            else:
+                print("  goal_test: FALSE — Falhas detetadas:")
+
+                # 1. Regiões incompletas
+                if not all_pieces:
+                    print("    - Regiões com número incorreto de letras:")
+                    for region_id in problem.regions:
+                        region_cells = board.get_region_positions(region_id)
+                        letras = [board.get_value(i, j) for i, j in region_cells if board.get_value(i, j) in "LITS"]
+                        if len(letras) != 4:
+                            print(f"      Região {region_id}: {len(letras)} letras (esperado: 4)")
+
+                # 2. Blocos 2x2 inválidos
+                if not no_2x2:
+                    print("    - Blocos 2x2 com letras:")
+                    for i in range(board.n - 1):
+                        for j in range(board.n - 1):
+                            v1 = board.get_value(i, j)
+                            v2 = board.get_value(i + 1, j)
+                            v3 = board.get_value(i, j + 1)
+                            v4 = board.get_value(i + 1, j + 1)
+                            if all(v in "LITS" for v in [v1, v2, v3, v4]):
+                                print(f"      → Bloco 2x2 com letras em ({i},{j}) [{v1}, {v2}, {v3}, {v4}]")
+
+                # 3. Conectividade
+                if not connected:
+                    from collections import deque
+
+                    visited = set()
+                    queue = deque()
+
+                    for i in range(board.n):
+                        for j in range(board.n):
+                            if board.get_value(i, j) in "LITS":
+                                queue.append((i, j))
+                                visited.add((i, j))
+                                break
+                        if queue:
+                            break
+
+                    while queue:
+                        i, j = queue.popleft()
+                        for ni, nj in [(i - 1, j), (i + 1, j), (i, j - 1), (i, j + 1)]:
+                            if 0 <= ni < board.n and 0 <= nj < board.n:
+                                if board.get_value(ni, nj) in "LITS" and (ni, nj) not in visited:
+                                    visited.add((ni, nj))
+                                    queue.append((ni, nj))
+
+                    total_letras = [
+                        (i, j) for i in range(board.n)
+                        for j in range(board.n)
+                        if board.get_value(i, j) in "LITS"
+                    ]
+                    print(f"    - Peças conectadas: {len(visited)} / {len(total_letras)}")
+                    print("      Células desconectadas:")
+                    for cell in total_letras:
+                        if cell not in visited:
+                            print(f"        {cell} = {board.get_value(cell[0], cell[1])}")
+
+                # 4. Peças iguais adjacentes
+                if not no_adj:
+                    print("    - Peças iguais ortogonalmente adjacentes:")
+                    for i in range(board.n):
+                        for j in range(board.n):
+                            val = board.get_value(i, j)
+                            if val not in "LITS":
+                                continue
+                            for ni, nj in [(i - 1, j), (i + 1, j), (i, j - 1), (i, j + 1)]:
+                                if 0 <= ni < board.n and 0 <= nj < board.n:
+                                    if board.get_value(ni, nj) == val:
+                                        print(f"      → ({i},{j}) e ({ni},{nj}) = '{val}' (inválido)")
+
+    
+    debug_goal_test_details(problem)'''
+
