@@ -6,8 +6,10 @@
 # 97226 João Teixeira 
 # 110094 Francisco Fialho
 
-from search import Node, Problem, astar_search, InstrumentedProblem, depth_first_tree_search
+from search import Node, Problem, astar_search, InstrumentedProblem, breadth_first_graph_search, depth_first_graph_search, depth_first_tree_search
 import copy
+import time
+import tracemalloc
 
 TETRAMINOS = {
     'L': [
@@ -247,8 +249,8 @@ class Nuruomino(Problem):
                             board.get_value(pos[0], pos[1]) not in "LITSX"  # pode ser número ou '?'
                             for pos in shape_abs
                         ):
-                            if self._would_create_2x2_block(shape_abs, board):
-                                continue
+                            '''if self._would_create_2x2_block(shape_abs, board):
+                                continue'''
                             if self._would_touch_equal_piece(shape_abs, piece_letter, board):
                                 continue
                             actions.append((region_id, piece_letter, shape, index, shape_abs))
@@ -296,28 +298,70 @@ class Nuruomino(Problem):
 
     # Game rules 
     def _all_regions_have_one_piece(self, board):
-        """Verifica se cada região tem exatamente uma peça tetraminó colocada (4 células com letra)."""
+        """Verifica se cada região tem exatamente uma peça tetraminó (4 células com letra), ignorando 'X'."""
+        '''
+            fazer um ciclo que percorra cada regiao, e em cada regiao verifica se tem uma peça, ou seja
+            4 letras todas pertencentes a LITS, peças estas que tem de estar conectadas entre si
+            nota que uma regiao nao precisa de estar toda preenchida com letras de LITS apenas tem de ter 4 letras, 
+            ou seja uma peça
+        '''
+        from collections import deque
+
+        def orthogonal_neighbors(i, j):
+            return [(i-1,j), (i+1,j), (i,j-1), (i,j+1)]
+
         for region_id in self.regions:
             region_cells = board.get_region_positions(region_id)
-            piece_cells = [board.get_value(i, j) for (i, j) in region_cells if board.get_value(i, j) in "LITS"]
-            if len(piece_cells) != 4:
+
+            # Filtrar apenas as posições com letras LITS
+            piece_positions = [
+                (i, j)
+                for (i, j) in region_cells
+                if board.get_value(i, j) in "LITS"
+            ]
+
+            if len(piece_positions) != 4:
                 return False
+
+            # Verificar se estão conectadas entre si ortogonalmente
+            visited = set()
+            queue = deque([piece_positions[0]])
+            visited.add(piece_positions[0])
+
+            while queue:
+                i, j = queue.popleft()
+                for ni, nj in orthogonal_neighbors(i, j):
+                    if (ni, nj) in piece_positions and (ni, nj) not in visited:
+                        visited.add((ni, nj))
+                        queue.append((ni, nj))
+
+            if len(visited) != 4:
+                return False
+
         return True
 
     def _has_no_2x2_blocks(self, board):
+        '''
+            Verifica se existem blocos 2x2 formados por celulas com peças, ou seja, com letras pertencentes a LITS
+        '''
         for i in range(board.n - 1):
             for j in range(board.n - 1):
-                block = {
+                values = [
                     board.get_value(i, j),
                     board.get_value(i+1, j),
                     board.get_value(i, j+1),
                     board.get_value(i+1, j+1)
-                }
-                if len(block) == 1 and block.pop() in "LITS":
+                ]
+                if all(v in "LITS" for v in values):
+                    #print(f"[DEBUG] Bloco 2x2 inválido encontrado em ({i},{j}) com letras: {values}")
                     return False
         return True
 
+
     def _is_connected(self, board, debug=False):
+        '''
+            Verifica se as peças estao conectadas ortagonalmente, isto é, tem de formar uma "ilha"
+        '''
         from collections import deque
 
         def orthogonal_neighbors(i, j):
@@ -372,6 +416,9 @@ class Nuruomino(Problem):
 
 
     def _no_same_piece_adjacent(self, board):
+        '''
+            Verifica se nao existem pelas iguais conectadas
+        '''
         for i in range(board.n):
             for j in range(board.n):
                 current = board.get_value(i, j)
@@ -387,14 +434,22 @@ class Nuruomino(Problem):
                             if reg1 != reg2:
                                 return False
         return True
-
+    
     def _would_create_2x2_block(self, positions, board):
         for (i, j) in positions:
             for di in [0, -1]:
                 for dj in [0, -1]:
-                    square = [(i+di, j+dj), (i+di+1, j+dj), (i+di, j+dj+1), (i+di+1, j+dj+1)]
-                    if all(0 <= x < board.n and 0 <= y < board.n and board.get_value(x, y) in "LITS"
-                        for (x, y) in square):
+                    square = [
+                        (i + di, j + dj),
+                        (i + di + 1, j + dj),
+                        (i + di, j + dj + 1),
+                        (i + di + 1, j + dj + 1)
+                    ]
+                    if all(
+                        0 <= x < board.n and 0 <= y < board.n and
+                        ((x, y) in positions or board.get_value(x, y) in "LITS")
+                        for (x, y) in square
+                    ):
                         return True
         return False
 
@@ -411,8 +466,6 @@ class Nuruomino(Problem):
                             if reg1 != reg2:
                                 return True
         return False
-
-
         
     def goal_test(self, state: NuruominoState):
         board = state.board
@@ -436,72 +489,7 @@ class Nuruomino(Problem):
         """Função heuristica utilizada para a procura A*."""
         board = node.state.board
         score = 0
-
-        # Penalizar regiões cujo tamanho não é múltiplo de 4
-        for region_id in self.regions:
-            region_cells = board.get_region_positions(region_id)
-            # Região ainda não preenchida
-            if any(board.get_value(i, j).isdigit() for (i, j) in region_cells):
-                if len(region_cells) % 4 != 0:
-                    score += 50  # Penalização alta: impossível de resolver
-
-        # Penalizar 'X' expostos (cantos perigosos)
-        for i in range(board.n):
-            for j in range(board.n):
-                if board.get_value(i, j) == 'X':
-                    # Verifica se ainda tem vizinhos preenchíveis
-                    for (ni, nj) in board.adjacent_positions(i, j):
-                        if board.get_value(ni, nj).isdigit():
-                            score += 10  # Penalização por X vulnerável
-                            break
-
-        # Penalizar buracos: células livres com poucos vizinhos livres
-        for i in range(board.n):
-            for j in range(board.n):
-                if board.get_value(i, j).isdigit():
-                    free_adj = sum(
-                        1 for (ni, nj) in board.adjacent_positions(i, j)
-                        if board.get_value(ni, nj).isdigit()
-                    )
-                    score += (4 - free_adj) ** 2  # Penalização quadrática
-
         return score'''
-    
-    # def h(self, node: Node):
-    #     board = node.state.board
-    #     score = 0
-
-    #     # 1. Penaliza regiões não preenchidas (prioridade máxima)
-    #     unfinished_regions = sum(
-    #         1 for region_id in self.regions
-    #         if any(board.get_value(i, j).isdigit() for (i, j) in board.get_region_positions(region_id))
-    #     )
-    #     score += unfinished_regions * 20  # Peso alto
-
-    #     # 2. Penaliza desconexão (prioridade alta)
-    #     if not self._is_connected(board):
-    #         score += 50
-
-    #     # 3. Penaliza blocos 2x2 (prioridade alta)
-    #     if not self._has_no_2x2_blocks(board):
-    #         score += 40
-
-    #     # 4. Penaliza peças iguais adjacentes (prioridade média)
-    #     if not self._no_same_piece_adjacent(board):
-    #         score += 30
-
-    #     # 5. Penaliza cantos 'X' com vizinhos não preenchidos (prioridade baixa)
-    #     for i in range(board.n):
-    #         for j in range(board.n):
-    #             if board.get_value(i, j) == 'X':
-    #                 adj_digits = sum(
-    #                     1 for (ni, nj) in board.adjacent_positions(i, j)
-    #                     if board.get_value(ni, nj).isdigit()
-    #                 )
-    #                 if adj_digits > 0:
-    #                     score += 5 * adj_digits
-
-    #     return score
 
     def h(self, node: Node):
         board = node.state.board
@@ -600,9 +588,7 @@ def marcar_celulas_comuns(board: Board, problem: Nuruomino):
             val = board.get_value(i, j)
             if val.isdigit():  # só marcamos se estiver ainda por preencher
                 board.board[i][j] = '?'
-                count += 1
-    if (count != 0):
-        marcar_cantos_comuns_invalidos(board)
+    marcar_cantos_comuns_invalidos(board)
 
 
 def marcar_cantos_comuns_invalidos(board: Board):
@@ -633,12 +619,20 @@ def limpar_celulas_interrogacao(board: Board):
             if board.get_value(i, j) == '?':
                 board.board[i][j] = board.regiao_original[i][j]
 
+def limpar_X(board: Board):
+    for i in range(board.n):
+        for j in range(board.n):
+            if board.get_value(i, j) == 'X':
+                board.board[i][j] = board.regiao_original[i][j]
 
 if __name__ == "__main__":
     board = Board.parse_instance()
 
     print("Grelha lida do input:")
     board.print_instance()
+
+    tracemalloc.start()
+    tic = time.perf_counter()
 
     # Guardar um copia original
     original_board_copy = copy.deepcopy(board.board)
@@ -672,7 +666,8 @@ if __name__ == "__main__":
     marcar_celulas_comuns(board, problem)
     board.print_instance()
 
-    # Após as deduções lógicas e cantos, limpa os '?'
+    # We use the ? to help us filter the actions, after that help they´re no longer needed
+    # therefore we turn them back to numbers to get the new list of actions
     print("\nTabuleiro após limpar células '?':")
     limpar_celulas_interrogacao(board)
     board.print_instance()
@@ -688,25 +683,30 @@ if __name__ == "__main__":
         print(f"Região {region_id} -> peça {piece} com forma {shape} na posição {shape_abs}")
 
 
-    # Obter o nó solução usando a procura em profundidade:
-    goal_node = depth_first_tree_search(problem)
-    # Verificar se foi atingida a solução
+    print("\nTabuleiro após limpar células 'X':")
+    limpar_X(board)
+    board.print_instance()
+
+    instrumented = InstrumentedProblem(problem)
+    #goal_node = astar_search(instrumented)
+
+    goal_node = breadth_first_graph_search(instrumented)
+    print("A testar com BFS...")
+
+    #goal_node = depth_first_graph_search(instrumented)
+    #print("A testar com DFS...")
+    
+    toc = time.perf_counter()
+    print(f"  Programa executado em {toc - tic:0.4f} segundos")
+    print(f"  Memória usada: {tracemalloc.get_traced_memory()[1] // 1024} kB")
+    print(f"  Nós gerados: {instrumented.states}")
+    print(f"  Nós expandidos: {instrumented.succs}")
     if goal_node:
         print("\nSolução encontrada:")
         goal_node.state.board.print_instance()
     else:
         print("Nenhuma solução encontrada.")
 
-
-    # instrumented = InstrumentedProblem(problem)
-    # goal_node = astar_search(instrumented)
-    # print(f"Nós gerados: {instrumented.states}")
-    # print(f"Nós expandidos: {instrumented.succs}")
-    # if goal_node:
-    #     print("\nSolução encontrada:")
-    #     goal_node.state.board.print_instance()
-    # else:
-    #     print("Nenhuma solução encontrada.")
 
     '''print("\nÚltimos 10 estados gerados:")
     for idx, b in enumerate(LAST_STATES):
