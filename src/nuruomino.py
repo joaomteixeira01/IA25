@@ -6,65 +6,70 @@
 # 97226 João Teixeira 
 # 110094 Francisco Fialho
 
-from search import Node, Problem, astar_search, InstrumentedProblem
+from search import Node, Problem, astar_search, InstrumentedProblem, depth_first_tree_search
 import copy
 
-# Tetraminos permitidos no puzzle (todas as rotações/reflexões)
 TETRAMINOS = {
     'L': [
-        [(0,0), (1,0), (2,0), (2,1)],
-        [(0,0), (0,1), (0,2), (1,0)],
-        [(0,0), (0,1), (1,1), (2,1)],
-        [(0,2), (1,0), (1,1), (1,2)],
-        [(0,0), (0,1), (1,0), (2,0)],
-        [(0,0), (0,1), (0,2), (1,2)],
-        [(0,1), (1,1), (2,0), (2,1)],
-        [(0,0), (1,0), (1,1), (1,2)],
+        [(0,0), (1,0), (2,0), (2,1)],   # L normal
+        [(0,0), (0,1), (0,2), (1,0)],   # L rodado 90º
+        [(0,0), (0,1), (1,1), (2,1)],   # L rodado 180º
+        [(0,2), (1,0), (1,1), (1,2)],   # L rodado 270º
+        [(0,1), (1,1), (2,1), (2,0)],   # L espelhado vertical
+        [(0,0), (1,0), (1,1), (1,2)],   # L espelhado horizontal
+        [(0,0), (0,1), (1,0), (2,0)],   # L rodado 90º espelhado
+        [(0,0), (0,1), (0,2), (1,2)],   # L rodado 270º espelhado
     ],
     'I': [
-        [(0,0), (1,0), (2,0), (3,0)],
-        [(0,0), (0,1), (0,2), (0,3)],
+        [(0,0), (1,0), (2,0), (3,0)],   # I vertical
+        [(0,0), (0,1), (0,2), (0,3)],   # I horizontal
     ],
     'T': [
-        [(0,0), (0,1), (0,2), (1,1)],
-        [(0,1), (1,0), (1,1), (2,1)],
-        [(1,0), (1,1), (1,2), (0,1)],
-        [(0,0), (1,0), (1,1), (2,0)],
+        [(0,0), (0,1), (0,2), (1,1)],   # T normal
+        [(0,1), (1,0), (1,1), (1,2)],   # T rodado 90º
+        [(1,0), (1,1), (1,2), (0,1)],   # T rodado 180º
+        [(0,0), (1,0), (1,1), (2,0)],   # T rodado 270º
     ],
     'S': [
-        [(0,1), (0,2), (1,0), (1,1)],
-        [(0,0), (1,0), (1,1), (2,1)],
-        [(0,0), (0,1), (1,1), (1,2)],
-        [(0,1), (1,1), (1,0), (2,0)],
+        [(0,1), (0,2), (1,0), (1,1)],   # S normal
+        [(0,0), (1,0), (1,1), (2,1)],   # S rodado 90º
+        [(0,0), (0,1), (1,1), (1,2)],   # S espelhado
+        [(0,1), (1,1), (1,0), (2,0)],   # S espelhado rodado 90º
     ],
 }
 
-# Pontos críticos que formam cantos por peça e rotação
 CORNER_OFFSETS = {
     'L': [
-        [(1, 1)],  # [(0,0), (1,0), (2,0), (2,1)]
-        [(1, 1)],  # [(0,0), (0,1), (0,2), (1,0)]
-        [(0, 1)],  # [(0,0), (0,1), (1,1), (2,1)]
-        [(0, 1)],  # [(0,2), (1,0), (1,1), (1,2)]
-        [(1, 1)],  # [(0,0), (0,1), (1,0), (2,0)]
-        [(1, 1)],  # [(0,0), (0,1), (0,2), (1,2)]
-        [(1, 0)],  # [(0,1), (1,1), (2,0), (2,1)]
-        [(0, 1)],  # [(0,0), (1,0), (1,1), (1,2)]
+        [(1,1)],   # para [(0,0), (1,0), (2,0), (2,1)]
+        [(1,1)],   # para [(0,0), (0,1), (0,2), (1,0)]
+        [(0,1)],   # para [(0,0), (0,1), (1,1), (2,1)]
+        [(0,1)],   # para [(0,2), (1,0), (1,1), (1,2)]
+        [(1,0)],   # para [(0,1), (1,1), (2,1), (2,0)]
+        [(0,1)],   # para [(0,0), (1,0), (1,1), (1,2)]
+        [(1,1)],   # para [(0,0), (0,1), (1,0), (2,0)]
+        [(1,1)],   # para [(0,0), (0,1), (0,2), (1,2)]
+    ],
+    'I': [
+        [],        # para [(0,0), (1,0), (2,0), (3,0)] (não tem canto)
+        [],        # para [(0,0), (0,1), (0,2), (0,3)] (não tem canto)
     ],
     'T': [
-        [(1, 0), (1, 2)],  # [(0,0), (0,1), (0,2), (1,1)]
-        [(0, 0), (2, 0)],  # [(0,1), (1,0), (1,1), (2,1)]
-        [(0, 0), (0, 2)],  # [(1,0), (1,1), (1,2), (0,1)]
-        [(0, 1), (2, 1)],  # [(0,0), (1,0), (1,1), (2,0)]
+        [(1,0), (1,2)],   # para [(0,0), (0,1), (0,2), (1,1)]
+        [(0,0), (1,0)],   # para [(0,1), (1,0), (1,1), (1,2)]
+        [(0,0), (0,2)],   # para [(1,0), (1,1), (1,2), (0,1)]
+        [(0,1), (2,1)],   # para [(0,1), (1,1), (2,1), (1,0)]
+        [(1,0), (1,1)],   # para [(0,0), (1,0), (2,0), (1,1)]
+        [(1,0), (1,2)],   # para [(0,0), (0,1), (0,2), (1,1)] (igual ao normal)
+        [(0,1), (2,1)],   # para [(0,1), (1,0), (1,1), (2,1)] (igual ao 270º)
+        [(0,0), (1,0)],   # para [(0,1), (1,0), (1,1), (1,2)] (igual ao 90º)
     ],
     'S': [
-        [(0, 0), (1, 2)],  # [(0,1), (0,2), (1,0), (1,1)]
-        [(0, 1), (2, 0)],  # [(0,0), (1,0), (1,1), (2,1)]
-        [(1, 0), (0, 2)],  # [(0,0), (0,1), (1,1), (1,2)]
-        [(0, 0), (2, 1)],  # [(0,1), (1,1), (1,0), (2,0)]
-    ]
+        [(0,0), (1,2)],   # para [(0,1), (0,2), (1,0), (1,1)]
+        [(0,1), (2,0)],   # para [(0,0), (1,0), (1,1), (2,1)]
+        [(1,0), (0,2)],   # para [(0,0), (0,1), (1,1), (1,2)]
+        [(0,0), (2,1)],   # para [(0,1), (1,1), (1,0), (2,0)]
+    ],
 }
-
 LAST_STATES = []
 
 
@@ -80,6 +85,15 @@ class NuruominoState:
         """ Este método é utilizado em caso de empate na gestão da lista
         de abertos nas procuras informadas. """
         return self.id < other.id
+    
+    def __eq__(self, other):
+        if not isinstance(other, NuruominoState):
+            return False
+        return all(self.board.get_value(i, j) == other.board.get_value(i, j)
+                for i in range(self.board.n) for j in range(self.board.n))
+
+    def __hash__(self):
+        return hash(tuple(tuple(row) for row in self.board.board))
 
 class Board:
     """Representação interna de um tabuleiro do Puzzle Nuruomino."""
@@ -157,11 +171,10 @@ class Board:
 
     # TODO: outros metodos da classe Board
     def get_region_positions(self, region_id):
-        """Devolve uma lista com as posições (i, j) da região dada."""
         positions = []
         for i in range(self.n):
             for j in range(self.n):
-                if self.board[i][j] == str(region_id):
+                if self.regiao_original[i][j] == str(region_id):
                     positions.append((i, j))
         return positions
     
@@ -214,7 +227,7 @@ class Nuruomino(Problem):
         actions = []
         board = state.board
 
-        # Podes priorizar regiões com 4 células, mas isso não deve impedir outras
+        # Podes priorizar regiões com 4 células
         regions_sorted = sorted(self.regions, key=lambda r: len(board.get_region_positions(r)) != 4)
 
         for region_id in regions_sorted:
@@ -224,6 +237,9 @@ class Nuruomino(Problem):
                 for index, shape in enumerate(shapes):
                     for origin in region_cells:
                         shape_abs = [(origin[0] + dx, origin[1] + dy) for dx, dy in shape]
+
+                         # DEBUG: Mostra cada tentativa de encaixe
+                        print(f"Tentando região {region_id} com peça {piece_letter} (forma {index}) na origem {origin}: {shape_abs}")
 
                         # Verifica se a peça encaixa na própria região e em células ainda disponíveis
                         if all(
@@ -238,6 +254,7 @@ class Nuruomino(Problem):
                             actions.append((region_id, piece_letter, shape, index, shape_abs))
 
         return actions
+
 
     def result(self, state: NuruominoState, action):
         """Retorna o estado resultante de executar a 'action' sobre
@@ -265,10 +282,11 @@ class Nuruomino(Problem):
                     if new_board_data[ci][cj].isdigit():
                         new_board_data[ci][cj] = 'X'
 
-        # Criar novo tabuleiro e novo estado
         new_board = Board(new_board_data)
 
-        # Adiciona esta linha ANTES de retornar o estado
+        # Copiar regiao_original para o novo board
+        new_board.regiao_original = state.board.regiao_original
+
         LAST_STATES.append(new_board)
 
         # Opcional: mantém só os últimos 10
@@ -350,6 +368,7 @@ class Nuruomino(Problem):
             print(f"Total de peças conectadas: {len(visited)} / {total_filled}")
 
         return len(visited) == total_filled
+        
 
 
     def _no_same_piece_adjacent(self, board):
@@ -362,7 +381,11 @@ class Nuruomino(Problem):
                     if 0 <= ni < board.n and 0 <= nj < board.n:
                         neighbor = board.get_value(ni, nj)
                         if neighbor == current:
-                            return False
+                            # Só é problema se estiverem em regiões diferentes
+                            reg1 = board.regiao_original[i][j]
+                            reg2 = board.regiao_original[ni][nj]
+                            if reg1 != reg2:
+                                return False
         return True
 
     def _would_create_2x2_block(self, positions, board):
@@ -375,26 +398,39 @@ class Nuruomino(Problem):
                         return True
         return False
 
-    def _would_touch_equal_piece(self, positions, piece_letter, board):
+    def _would_touch_equal_piece(self, positions, piece_letter, board: Board):
         for (i, j) in positions:
-            for (ni, nj) in board.adjacent_positions(i, j):
-                if (ni, nj) not in positions:
-                    val = board.get_value(ni, nj)
-                    if val == piece_letter:
-                        return True
+            for (ni, nj) in [(i-1, j), (i+1, j), (i, j-1), (i, j+1)]:
+                if 0 <= ni < board.n and 0 <= nj < board.n:
+                    if (ni, nj) not in positions:
+                        val = board.get_value(ni, nj)
+                        if val == piece_letter:
+                            # Só bloqueia se estiverem em regiões diferentes
+                            reg1 = board.regiao_original[i][j]
+                            reg2 = board.regiao_original[ni][nj]
+                            if reg1 != reg2:
+                                return True
         return False
 
 
         
     def goal_test(self, state: NuruominoState):
-        """Retorna True se e só se o estado passado como argumento é
-        um estado objetivo. Deve verificar se todas as posições do tabuleiro
-        estão preenchidas de acordo com as regras do problema."""
         board = state.board
-        return (self._all_regions_have_one_piece(board) and 
-                self._has_no_2x2_blocks(board) and 
-                self._is_connected(board) and 
-                self._no_same_piece_adjacent(board))
+        print("\n[DEBUG] Estado atual do tabuleiro:")
+        board.print_instance()
+        
+        all_pieces = self._all_regions_have_one_piece(board)
+        no_2x2 = self._has_no_2x2_blocks(board) 
+        connected = self._is_connected(board, debug=True)  # Ative o debug
+        no_adj = self._no_same_piece_adjacent(board)
+        
+        print(f"\nGoal Test Results:")
+        print(f"- Todas regiões têm peça: {all_pieces}")
+        print(f"- Sem blocos 2x2: {no_2x2}")
+        print(f"- Peças conectadas: {connected}")
+        print(f"- Sem peças iguais adjacentes: {no_adj}")
+        
+        return all([all_pieces, no_2x2, connected, no_adj])
 
     '''def h(self, node: Node):
         """Função heuristica utilizada para a procura A*."""
@@ -520,17 +556,24 @@ def preenche_regioes_de_4_celulas(board: Board, problem: Nuruomino) -> Board:
     for region_id in problem.regions:
         region_cells = new_board.get_region_positions(region_id)
         if len(region_cells) == 4 and all(new_board.get_value(i, j).isdigit() or new_board.get_value(i, j) == '?' for (i, j) in region_cells):
-            # Criamos um estado temporário para gerar ações
             temp_state = NuruominoState(new_board)
             actions = problem.actions(temp_state)
+            
+            # Tentar todas as ações para esta região antes de passar para a próxima
             for action in actions:
                 if action[0] == region_id:
-                    print(f"A aplicar na região {region_id}: {action}")
-                    temp_state = problem.result(temp_state, action)
-                    new_board = temp_state.board
-                    break
+                    print(f"Tentando ação na região {region_id}: {action}")
+                    temp_state_result = problem.result(temp_state, action)
+                    # Verificar se a ação preencheu a região corretamente
+                    if all(temp_state_result.board.get_value(i, j) != '?' for (i, j) in region_cells):
+                        new_board = temp_state_result.board
+                        print(f"Região {region_id} preenchida com sucesso!")
+                        break  # Sai do loop assim que uma ação válida for encontrada
+            else:
+                print(f"Nenhuma ação válida encontrada para a região {region_id}")
 
     return new_board
+
 
 def marcar_celulas_comuns(board: Board, problem: Nuruomino):
     """Marca no tabuleiro as células que são comuns a todas as ações possíveis por região."""
@@ -622,7 +665,7 @@ if __name__ == "__main__":
     state_temp = NuruominoState(board)
     for action in problem.actions(state_temp):
         region_id, piece, shape, index, shape_abs = action
-        print(f"Região {region_id} → peça {piece} com forma {shape} na posição {shape_abs}")
+        print(f"Região {region_id} -> peça {piece} com forma {shape} na posição {shape_abs}")
 
     # Marcar células deduzidas por interseção de possibilidades
     print("\nMarcar células comuns nas regiões restantes:")
@@ -642,17 +685,28 @@ if __name__ == "__main__":
     print("\nAções válidas no estado atual:")
     for action in problem.actions(state):
         region_id, piece, shape, index, shape_abs = action
-        print(f"Região {region_id} → peça {piece} com forma {shape} na posição {shape_abs}")
+        print(f"Região {region_id} -> peça {piece} com forma {shape} na posição {shape_abs}")
 
-    instrumented = InstrumentedProblem(problem)
-    goal_node = astar_search(instrumented)
-    print(f"Nós gerados: {instrumented.states}")
-    print(f"Nós expandidos: {instrumented.succs}")
+
+    # Obter o nó solução usando a procura em profundidade:
+    goal_node = depth_first_tree_search(problem)
+    # Verificar se foi atingida a solução
     if goal_node:
         print("\nSolução encontrada:")
         goal_node.state.board.print_instance()
     else:
         print("Nenhuma solução encontrada.")
+
+
+    # instrumented = InstrumentedProblem(problem)
+    # goal_node = astar_search(instrumented)
+    # print(f"Nós gerados: {instrumented.states}")
+    # print(f"Nós expandidos: {instrumented.succs}")
+    # if goal_node:
+    #     print("\nSolução encontrada:")
+    #     goal_node.state.board.print_instance()
+    # else:
+    #     print("Nenhuma solução encontrada.")
 
     '''print("\nÚltimos 10 estados gerados:")
     for idx, b in enumerate(LAST_STATES):
