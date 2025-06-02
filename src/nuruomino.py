@@ -7,6 +7,7 @@
 # 110094 Francisco Fialho
 
 from search import Node, Problem, astar_search, InstrumentedProblem
+import copy
 
 # Tetraminos permitidos no puzzle (todas as rotações/reflexões)
 TETRAMINOS = {
@@ -227,7 +228,7 @@ class Nuruomino(Problem):
                         # Verifica se a peça encaixa na própria região e em células ainda disponíveis
                         if all(
                             pos in region_cells and
-                            board.get_value(pos[0], pos[1]) not in "LITS?"  # pode ser número ou '?'
+                            board.get_value(pos[0], pos[1]) not in "LITSX"  # pode ser número ou '?'
                             for pos in shape_abs
                         ):
                             if self._would_create_2x2_block(shape_abs, board):
@@ -244,7 +245,6 @@ class Nuruomino(Problem):
         das presentes na lista obtida pela execução de
         self.actions(state)."""
 
-        import copy
         region_id, piece_letter, shape, index, shape_abs = action
 
         new_board_data = copy.deepcopy(state.board.board)
@@ -515,8 +515,6 @@ class Nuruomino(Problem):
         return h_n
 
 def preenche_regioes_de_4_celulas(board: Board, problem: Nuruomino) -> Board:
-    import copy
-
     new_board = copy.deepcopy(board)
 
     for region_id in problem.regions:
@@ -538,6 +536,7 @@ def marcar_celulas_comuns(board: Board, problem: Nuruomino):
     """Marca no tabuleiro as células que são comuns a todas as ações possíveis por região."""
     state = NuruominoState(board)
     acoes = problem.actions(state)
+    count = 0
 
     from collections import defaultdict
     regioes_shapes = defaultdict(list)
@@ -558,7 +557,9 @@ def marcar_celulas_comuns(board: Board, problem: Nuruomino):
             val = board.get_value(i, j)
             if val.isdigit():  # só marcamos se estiver ainda por preencher
                 board.board[i][j] = '?'
-    marcar_cantos_comuns_invalidos(board)
+                count += 1
+    if (count != 0):
+        marcar_cantos_comuns_invalidos(board)
 
 
 def marcar_cantos_comuns_invalidos(board: Board):
@@ -583,11 +584,22 @@ def marcar_cantos_comuns_invalidos(board: Board):
                 (dx, dy) = digitos[0]
                 board.board[dx][dy] = 'X'
 
+def limpar_celulas_interrogacao(board: Board):
+    for i in range(board.n):
+        for j in range(board.n):
+            if board.get_value(i, j) == '?':
+                board.board[i][j] = board.regiao_original[i][j]
+
+
 if __name__ == "__main__":
     board = Board.parse_instance()
 
     print("Grelha lida do input:")
     board.print_instance()
+
+    # Guardar um copia original
+    original_board_copy = copy.deepcopy(board.board)
+    board.regiao_original = original_board_copy
 
     problem = Nuruomino(board)
     #state = NuruominoState(board)
@@ -599,6 +611,9 @@ if __name__ == "__main__":
 
     # Aplicamos peças nas regiões com 4 células
     board = preenche_regioes_de_4_celulas(board, problem)
+
+    #Atribuir novamente a cópia original ao novo board criado
+    board.regiao_original = original_board_copy
 
     print("\nTabuleiro após preencher todas as regiões de 4 células:")
     board.print_instance()
@@ -612,6 +627,11 @@ if __name__ == "__main__":
     # Marcar células deduzidas por interseção de possibilidades
     print("\nMarcar células comuns nas regiões restantes:")
     marcar_celulas_comuns(board, problem)
+    board.print_instance()
+
+    # Após as deduções lógicas e cantos, limpa os '?'
+    print("\nTabuleiro após limpar células '?':")
+    limpar_celulas_interrogacao(board)
     board.print_instance()
 
     # Criamos o novo estado inicial com as peças já aplicadas
