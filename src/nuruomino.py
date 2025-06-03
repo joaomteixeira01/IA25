@@ -13,65 +13,64 @@ import tracemalloc
 
 TETRAMINOS = {
     'L': [
-        [(0,0), (1,0), (2,0), (2,1)],   # L normal
-        [(0,0), (0,1), (0,2), (1,0)],   # L rodado 90º
-        [(0,0), (0,1), (1,1), (2,1)],   # L rodado 180º
-        [(0,2), (1,0), (1,1), (1,2)],   # L rodado 270º
-        [(0,1), (1,1), (2,1), (2,0)],   # L espelhado vertical
-        [(0,0), (1,0), (1,1), (1,2)],   # L espelhado horizontal
-        [(0,0), (0,1), (1,0), (2,0)],   # L rodado 90º espelhado
-        [(0,0), (0,1), (0,2), (1,2)],   # L rodado 270º espelhado
+        [(0, 0), (-1, 0), (-1, 1), (-1, 2)],
+        [(0, 0), (0, -1), (1, -1), (2, -1)],
+        [(0, 0), (0, -1), (-1, -1), (-2, -1)],
+        [(0, 0), (-1, 0), (-1, -1), (-1, -2)],
+        [(0, 0), (0, 1), (-1, 1), (-2, 1)],
+        [(0, 0), (0, 1), (1, 1), (2, 1)],
+        [(0, 0), (1, 0), (1, 1), (1, 2)],
+        [(0, 0), (1, 0), (1, -1), (1, -2)],
     ],
     'I': [
-        [(0,0), (1,0), (2,0), (3,0)],   # I vertical
-        [(0,0), (0,1), (0,2), (0,3)],   # I horizontal
+        [(0, 0), (1, 0), (2, 0), (3, 0)],
+        [(0, 0), (0, 1), (0, 2), (0, 3)],
     ],
     'T': [
-        [(0,0), (0,1), (0,2), (1,1)],   # T normal
-        [(0,1), (1,0), (1,1), (1,2)],   # T rodado 90º
-        [(1,0), (1,1), (1,2), (0,1)],   # T rodado 180º
-        [(0,0), (1,0), (1,1), (2,0)],   # T rodado 270º
+        [(0, 0), (0, 1), (0, 2), (1, 1)],
+        [(0, 0), (1, -1), (1, 0), (2, 0)],
+        [(0, 0), (1, 0), (1, 1), (1, -1)],
+        [(0, 0), (1, 0), (1, 1), (2, 0)],
     ],
     'S': [
-        [(0,1), (0,2), (1,0), (1,1)],   # S normal
-        [(0,0), (1,0), (1,1), (2,1)],   # S rodado 90º
-        [(0,0), (0,1), (1,1), (1,2)],   # S espelhado
-        [(0,1), (1,1), (1,0), (2,0)],   # S espelhado rodado 90º
+        [(0, 0), (0, -1), (-1, -1), (-1, -2)],
+        [(0, 0), (1, 0), (1, 1), (2, 1)],
+        [(0, 0), (0, 1), (-1, 1), (-1, 2)],
+        [(0, 0), (1, -1), (1, 0), (2, -1)],
+    ]
+}
+  
+CORNER_OFFSETS = {
+    'L': [
+        [(0,1)],    
+        [(1,0)],
+        [(-1,0)],
+        [(0,-1)],
+        [(-1,0)],
+        [(1,0)],
+        [(0,1)],
+        [(0,-1)],
+    ],
+    'I': [
+        [],                # I vertical: [(0,0), (1,0), (2,0), (3,0)]
+        [],                # I horizontal: [(0,0), (0,1), (0,2), (0,3)]
+    ],
+    'T': [
+        [(1,0), (1,2)],    
+        [(0,-1), (2,-1)],
+        [(0,-1), (0,1)],
+        [(0,1), (2,1)],
+
+    ],
+    'S': [
+        [(-2,0), (1,0)],     
+        [(0,1), (2,0)],
+        [(0,2), (-1,0)],
+        [(0,-1), (2,0)]
     ],
 }
 
-CORNER_OFFSETS = {
-    'L': [
-        [(1,1)],   # para [(0,0), (1,0), (2,0), (2,1)]
-        [(1,1)],   # para [(0,0), (0,1), (0,2), (1,0)]
-        [(0,1)],   # para [(0,0), (0,1), (1,1), (2,1)]
-        [(0,1)],   # para [(0,2), (1,0), (1,1), (1,2)]
-        [(1,0)],   # para [(0,1), (1,1), (2,1), (2,0)]
-        [(0,1)],   # para [(0,0), (1,0), (1,1), (1,2)]
-        [(1,1)],   # para [(0,0), (0,1), (1,0), (2,0)]
-        [(1,1)],   # para [(0,0), (0,1), (0,2), (1,2)]
-    ],
-    'I': [
-        [],        # para [(0,0), (1,0), (2,0), (3,0)] (não tem canto)
-        [],        # para [(0,0), (0,1), (0,2), (0,3)] (não tem canto)
-    ],
-    'T': [
-        [(1,0), (1,2)],   # para [(0,0), (0,1), (0,2), (1,1)]
-        [(0,0), (1,0)],   # para [(0,1), (1,0), (1,1), (1,2)]
-        [(0,0), (0,2)],   # para [(1,0), (1,1), (1,2), (0,1)]
-        [(0,1), (2,1)],   # para [(0,1), (1,1), (2,1), (1,0)]
-        [(1,0), (1,1)],   # para [(0,0), (1,0), (2,0), (1,1)]
-        [(1,0), (1,2)],   # para [(0,0), (0,1), (0,2), (1,1)] (igual ao normal)
-        [(0,1), (2,1)],   # para [(0,1), (1,0), (1,1), (2,1)] (igual ao 270º)
-        [(0,0), (1,0)],   # para [(0,1), (1,0), (1,1), (1,2)] (igual ao 90º)
-    ],
-    'S': [
-        [(0,0), (1,2)],   # para [(0,1), (0,2), (1,0), (1,1)]
-        [(0,1), (2,0)],   # para [(0,0), (1,0), (1,1), (2,1)]
-        [(1,0), (0,2)],   # para [(0,0), (0,1), (1,1), (1,2)]
-        [(0,0), (2,1)],   # para [(0,1), (1,1), (1,0), (2,0)]
-    ],
-}
+
 LAST_STATES = []
 
 
@@ -103,6 +102,7 @@ class Board:
     def __init__(self, board):
         self.board = board
         self.n = len(board)
+        self.regiao_original = copy.deepcopy(board)  # guarda a grelha original para referência
 
     def get_value(self, row, col):
         """Devolve o valor da célula na posição (row, col)"""
@@ -235,13 +235,30 @@ class Nuruomino(Problem):
         for region_id in regions_sorted:
             region_cells = board.get_region_positions(region_id)
 
+            # Check if region already has some LITS letters placed
+            has_letters = any(
+                board.get_value(i, j) in "LITS"
+                for (i, j) in region_cells
+            )
+
+            # If region already has some letters but not exactly 4, skip it
+            # This prevents adding multiple tetrominoes to a single region
+            piece_positions = [
+                (i, j) for (i, j) in region_cells 
+                if board.get_value(i, j) in "LITS"
+            ]
+            
+            # Skip if region already has some letters but not a complete tetromino
+            if has_letters and len(piece_positions) != 4:
+                continue
+
             for piece_letter, shapes in TETRAMINOS.items():
                 for index, shape in enumerate(shapes):
                     for origin in region_cells:
                         shape_abs = [(origin[0] + dx, origin[1] + dy) for dx, dy in shape]
 
                          # DEBUG: Mostra cada tentativa de encaixe
-                        print(f"Tentando região {region_id} com peça {piece_letter} (forma {index}) na origem {origin}: {shape_abs}")
+                        # print(f"Tentando regiao {region_id} com peça {piece_letter} (forma {index}) na origem {origin}: {shape_abs}")
 
                         # Verifica se a peça encaixa na própria região e em células ainda disponíveis
                         if all(
@@ -254,6 +271,17 @@ class Nuruomino(Problem):
                             if self._would_touch_equal_piece(shape_abs, piece_letter, board):
                                 continue
                             actions.append((region_id, piece_letter, shape, index, shape_abs))
+                        # else:
+                        #     # Para debug
+                        #     falhas = []
+                        #     for pos in shape_abs:
+                        #         if pos not in region_cells:
+                        #             falhas.append(f"Posicao {pos} nao esta na regiao {region_id}")
+                        #         elif board.get_value(pos[0], pos[1]) in "LITSX":
+                        #             falhas.append(f"Posicao {pos} ja tem valor {board.get_value(pos[0], pos[1])}")
+                            
+                        #     if falhas:
+                        #         print(f"Rejeicao: {', '.join(falhas)}")
 
         return actions
 
@@ -299,45 +327,42 @@ class Nuruomino(Problem):
     # Game rules 
     def _all_regions_have_one_piece(self, board):
         """Verifica se cada região tem exatamente uma peça tetraminó (4 células com letra), ignorando 'X'."""
-        '''
-            fazer um ciclo que percorra cada regiao, e em cada regiao verifica se tem uma peça, ou seja
-            4 letras todas pertencentes a LITS, peças estas que tem de estar conectadas entre si
-            nota que uma regiao nao precisa de estar toda preenchida com letras de LITS apenas tem de ter 4 letras, 
-            ou seja uma peça
-        '''
         from collections import deque
-
+    
         def orthogonal_neighbors(i, j):
             return [(i-1,j), (i+1,j), (i,j-1), (i,j+1)]
-
+    
         for region_id in self.regions:
             region_cells = board.get_region_positions(region_id)
-
+    
             # Filtrar apenas as posições com letras LITS
             piece_positions = [
                 (i, j)
                 for (i, j) in region_cells
                 if board.get_value(i, j) in "LITS"
             ]
-
+    
+            if len(piece_positions) == 0:
+                return False  # região sem peça
+    
             if len(piece_positions) != 4:
                 return False
-
+    
             # Verificar se estão conectadas entre si ortogonalmente
             visited = set()
             queue = deque([piece_positions[0]])
             visited.add(piece_positions[0])
-
+    
             while queue:
                 i, j = queue.popleft()
                 for ni, nj in orthogonal_neighbors(i, j):
                     if (ni, nj) in piece_positions and (ni, nj) not in visited:
                         visited.add((ni, nj))
                         queue.append((ni, nj))
-
+    
             if len(visited) != 4:
                 return False
-
+    
         return True
 
     def _has_no_2x2_blocks(self, board):
@@ -408,7 +433,7 @@ class Nuruomino(Problem):
         if debug:
             print(f"\n[DEBUG] Peças conectadas ortogonalmente:")
             for a, b in sorted(piece_connections):
-                print(f"  → {a} conectado a {b}")
+                print(f"  -> {a} conectado a {b}")
             print(f"Total de peças conectadas: {len(visited)} / {total_filled}")
 
         return len(visited) == total_filled
@@ -591,6 +616,7 @@ def marcar_celulas_comuns(board: Board, problem: Nuruomino):
     marcar_cantos_comuns_invalidos(board)
 
 
+
 def marcar_cantos_comuns_invalidos(board: Board):
     """Marca com 'X' todas as células que, se preenchidas, formariam blocos 2x2 com 'letras' ou '?'."""
     for i in range(board.n - 1):
@@ -668,7 +694,7 @@ if __name__ == "__main__":
 
     # We use the ? to help us filter the actions, after that help they´re no longer needed
     # therefore we turn them back to numbers to get the new list of actions
-    print("\nTabuleiro após limpar células '?':")
+    print("\nTabuleiro apos limpar celulas '?':")
     limpar_celulas_interrogacao(board)
     board.print_instance()
 
@@ -683,9 +709,9 @@ if __name__ == "__main__":
         print(f"Região {region_id} -> peça {piece} com forma {shape} na posição {shape_abs}")
 
 
-    print("\nTabuleiro após limpar células 'X':")
-    limpar_X(board)
-    board.print_instance()
+    # print("\nTabuleiro apos limpar celulas 'X':")
+    # limpar_X(board)
+    # board.print_instance()
 
     instrumented = InstrumentedProblem(problem)
     #goal_node = astar_search(instrumented)
