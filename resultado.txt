@@ -1,29 +1,29 @@
 Grelha lida do input:
-1	1	2	2	3	3
-1	2	2	2	3	3
-1	3	3	2	3	5
-3	3	3	3	3	5
-4	4	4	3	3	5
-4	3	3	3	3	5
+1	1	1	1	2	2
+1	2	2	2	2	3
+3	3	3	3	3	3
+3	4	3	3	5	3
+4	4	4	5	5	3
+5	5	5	5	3	3
 
 Número de células por região:
- - Região 1: 4 células
+ - Região 1: 5 células
  - Região 2: 6 células
- - Região 3: 18 células
+ - Região 3: 14 células
  - Região 4: 4 células
- - Região 5: 4 células
+ - Região 5: 7 células
 
 Ações válidas no estado atual:
-[DEBUG] Focando na região 1 com 1 ações possíveis
-Região 1 -> peça L com forma [(0, 0), (0, -1), (1, -1), (2, -1)] na posição [(0, 1), (0, 0), (1, 0), (2, 0)]
+[DEBUG] Região 1 tem 1 ações possíveis (restrita, devolve já)
+Região 1 -> peça L com forma [(0, 0), (-1, 0), (-1, 1), (-1, 2)] na posição [(1, 0), (0, 0), (0, 1), (0, 2)]
 
 [DEBUG] Estado atual do tabuleiro:
-1	1	2	2	3	3
-1	2	2	2	3	3
-1	3	3	2	3	5
-3	3	3	3	3	5
-4	4	4	3	3	5
-4	3	3	3	3	5
+1	1	1	1	2	2
+1	2	2	2	2	3
+3	3	3	3	3	3
+3	4	3	3	5	3
+4	4	4	5	5	3
+5	5	5	5	3	3
 
 [DEBUG] Peças conectadas ortogonalmente:
 Total de peças conectadas: 0 / 0
@@ -33,15 +33,15 @@ Goal Test Results:
 - Sem blocos 2x2: True
 - Peças conectadas: True
 - Sem peças iguais adjacentes: True
-[DEBUG] Focando na região 1 com 1 ações possíveis
+[DEBUG] Região 1 tem 1 ações possíveis (restrita, devolve já)
 
 [DEBUG] Estado atual do tabuleiro:
-L	L	2	2	3	3
-L	X	2	2	3	3
-L	3	3	2	3	5
-3	3	3	3	3	5
-4	4	4	3	3	5
-4	3	3	3	3	5
+L	L	L	1	2	2
+L	X	2	2	2	3
+3	3	3	3	3	3
+3	4	3	3	5	3
+4	4	4	5	5	3
+5	5	5	5	3	3
 
 [DEBUG] Peças conectadas ortogonalmente:
 Total de peças conectadas: 4 / 4
@@ -51,15 +51,15 @@ Goal Test Results:
 - Sem blocos 2x2: True
 - Peças conectadas: True
 - Sem peças iguais adjacentes: True
-[DEBUG] Focando na região 4 com 1 ações possíveis
+[DEBUG] Região 2 tem 1 ações possíveis (restrita, devolve já)
 
 [DEBUG] Estado atual do tabuleiro:
-L	L	2	2	3	3
-L	X	2	2	3	3
-L	3	3	2	3	5
-3	3	3	3	3	5
-L	L	L	3	3	5
-L	X	3	3	3	5
+L	L	L	X	S	S
+L	X	2	S	S	X
+3	3	3	3	3	3
+3	4	3	3	5	3
+4	4	4	5	5	3
+5	5	5	5	3	3
 
 [DEBUG] Peças conectadas ortogonalmente:
 Total de peças conectadas: 4 / 8
@@ -69,15 +69,15 @@ Goal Test Results:
 - Sem blocos 2x2: True
 - Peças conectadas: False
 - Sem peças iguais adjacentes: True
-[DEBUG] Focando na região 5 com 1 ações possíveis
+[DEBUG] Região 4 tem 1 ações possíveis (restrita, devolve já)
 
 [DEBUG] Estado atual do tabuleiro:
-L	L	2	2	3	3
-L	X	2	2	3	3
-L	3	3	2	3	I
-3	3	3	3	3	I
-L	L	L	3	3	I
-L	X	3	3	3	I
+L	L	L	X	S	S
+L	X	2	S	S	X
+3	3	3	3	3	3
+X	T	X	3	5	3
+T	T	T	5	5	3
+5	5	5	5	3	3
 
 [DEBUG] Peças conectadas ortogonalmente:
 Total de peças conectadas: 4 / 12
@@ -87,56 +87,41 @@ Goal Test Results:
 - Sem blocos 2x2: True
 - Peças conectadas: False
 - Sem peças iguais adjacentes: True
-[DEBUG] Focando na região 2 com 2 ações possíveis
+[DEBUG] Região 3 tem 1 ações possíveis (restrita, devolve já)
 
 [DEBUG] Estado atual do tabuleiro:
-L	L	X	T	3	3
-L	X	T	T	3	3
-L	3	X	T	3	I
-3	3	3	3	3	I
-L	L	L	3	3	I
-L	X	3	3	3	I
+L	L	L	X	S	S
+L	X	2	S	S	X
+I	I	I	I	3	3
+X	T	X	3	5	3
+T	T	T	5	5	3
+5	5	5	5	3	3
 
 [DEBUG] Peças conectadas ortogonalmente:
-Total de peças conectadas: 4 / 16
-
-Goal Test Results:
-- Todas regiões têm peça: False
-- Sem blocos 2x2: True
-- Peças conectadas: False
-- Sem peças iguais adjacentes: True
-
-[DEBUG] Estado atual do tabuleiro:
-L	L	S	X	3	3
-L	X	S	S	3	3
-L	3	X	S	3	I
-3	3	3	3	3	I
-L	L	L	3	3	I
-L	X	3	3	3	I
-
-[DEBUG] Peças conectadas ortogonalmente:
-  -> L conectado a S
-Total de peças conectadas: 8 / 16
-
-Goal Test Results:
-- Todas regiões têm peça: False
-- Sem blocos 2x2: True
-- Peças conectadas: False
-- Sem peças iguais adjacentes: True
-[DEBUG] Focando na região 3 com 1 ações possíveis
-
-[DEBUG] Estado atual do tabuleiro:
-L	L	S	X	3	3
-L	X	S	S	3	3
-L	3	X	S	3	I
-3	3	3	T	X	I
-L	L	L	T	T	I
-L	X	3	T	X	I
-
-[DEBUG] Peças conectadas ortogonalmente:
+  -> I conectado a L
+  -> I conectado a S
   -> I conectado a T
-  -> L conectado a S
-  -> L conectado a T
+Total de peças conectadas: 16 / 16
+
+Goal Test Results:
+- Todas regiões têm peça: False
+- Sem blocos 2x2: True
+- Peças conectadas: True
+- Sem peças iguais adjacentes: True
+[DEBUG] Região 5 tem 1 ações possíveis (restrita, devolve já)
+
+[DEBUG] Estado atual do tabuleiro:
+L	L	L	X	S	S
+L	X	2	S	S	X
+I	I	I	I	3	3
+X	T	X	X	S	3
+T	T	T	S	S	3
+5	5	5	S	X	3
+
+[DEBUG] Peças conectadas ortogonalmente:
+  -> I conectado a L
+  -> I conectado a S
+  -> I conectado a T
   -> S conectado a T
 Total de peças conectadas: 20 / 20
 
@@ -145,16 +130,16 @@ Goal Test Results:
 - Sem blocos 2x2: True
 - Peças conectadas: True
 - Sem peças iguais adjacentes: True
-A testar com BFS...
-  Programa executado em 0.0415 segundos
-  Memória usada: 35 kB
-  Nós gerados: 6
-  Nós expandidos: 6
+A testar com DFS...
+  Programa executado em 0.0328 segundos
+  Memória usada: 32 kB
+  Nós gerados: 5
+  Nós expandidos: 5
 
 Solução encontrada:
-L	L	S	X	3	3
-L	X	S	S	3	3
-L	3	X	S	3	I
-3	3	3	T	X	I
-L	L	L	T	T	I
-L	X	3	T	X	I
+L	L	L	X	S	S
+L	X	2	S	S	X
+I	I	I	I	3	3
+X	T	X	X	S	3
+T	T	T	S	S	3
+5	5	5	S	X	3
