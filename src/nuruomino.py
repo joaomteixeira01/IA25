@@ -223,13 +223,12 @@ class Nuruomino(Problem):
         return False
 
 
-    def actions(self, state: NuruominoState):
+    def actions1(self, state: NuruominoState):
         """Retorna uma lista de ações que podem ser executadas a
         partir do estado passado como argumento."""
         actions = []
         board = state.board
 
-        # Podes priorizar regiões com 4 células
         regions_sorted = sorted(self.regions, key=lambda r: len(board.get_region_positions(r)) != 4)
 
         for region_id in regions_sorted:
@@ -257,8 +256,8 @@ class Nuruomino(Problem):
                     for origin in region_cells:
                         shape_abs = [(origin[0] + dx, origin[1] + dy) for dx, dy in shape]
 
-                         # DEBUG: Mostra cada tentativa de encaixe
-                        # print(f"Tentando regiao {region_id} com peça {piece_letter} (forma {index}) na origem {origin}: {shape_abs}")
+                        # DEBUG: Mostra cada tentativa de encaixe
+                        print(f"Tentando regiao {region_id} com peça {piece_letter} (forma {index}) na origem {origin}: {shape_abs}")
 
                         # Verifica se a peça encaixa na própria região e em células ainda disponíveis
                         if all(
@@ -284,6 +283,72 @@ class Nuruomino(Problem):
                         #         print(f"Rejeicao: {', '.join(falhas)}")
 
         return actions
+    
+
+    def actions(self, state: NuruominoState):
+        """Retorna uma lista de ações que podem ser executadas a
+        partir do estado passado como argumento."""
+        board = state.board
+        
+        # Dicionário para rastrear quantidade de ações potenciais e as ações válidas por região
+        region_actions_count = {}
+        valid_actions_by_region = {}
+        
+        # Iteração única para contar e armazenar ações válidas por região
+        for region_id in self.regions:
+            region_cells = board.get_region_positions(region_id)
+            
+            # Verifica se a região já tem algumas letras colocadas
+            has_letters = any(
+                board.get_value(i, j) in "LITS"
+                for (i, j) in region_cells
+            )
+            
+            # Pula se a região já tem algumas letras mas não exatamente 4
+            piece_positions = [
+                (i, j) for (i, j) in region_cells 
+                if board.get_value(i, j) in "LITS"
+            ]
+            
+            if has_letters and len(piece_positions) != 4:
+                # Pula regiões com peças parciais
+                continue
+                
+            # Armazena as ações válidas enquanto conta
+            actions_for_region = []
+            
+            for piece_letter, shapes in TETRAMINOS.items():
+                for index, shape in enumerate(shapes):
+                    for origin in region_cells:
+                        shape_abs = [(origin[0] + dx, origin[1] + dy) for dx, dy in shape]
+                        
+                        # Verifica se a peça cabe nesta região nesta origem
+                        if all(
+                            pos in region_cells and
+                            board.get_value(pos[0], pos[1]) not in "LITSX"  
+                            for pos in shape_abs
+                        ):
+                            if not self._would_touch_equal_piece(shape_abs, piece_letter, board) and not self._would_create_2x2_block(shape_abs, board):
+                                # Armazena a ação válida
+                                actions_for_region.append((region_id, piece_letter, shape, index, shape_abs))
+
+            
+            # Se encontrou ações válidas para esta região
+            if actions_for_region:
+                region_actions_count[region_id] = len(actions_for_region)
+                valid_actions_by_region[region_id] = actions_for_region
+        
+        # Nenhuma ação válida para qualquer região
+        if not region_actions_count:
+            return []
+        
+        # Encontra a região com o menor número de ações (mais restrita)
+        most_constrained_region = min(region_actions_count.items(), key=lambda x: x[1])[0]
+        
+        print(f"[DEBUG] Focando na região {most_constrained_region} com {region_actions_count[most_constrained_region]} ações possíveis")
+        
+        # Retorna diretamente as ações já calculadas para a região mais restrita
+        return valid_actions_by_region[most_constrained_region]
 
 
     def result(self, state: NuruominoState, action):
@@ -475,8 +540,8 @@ class Nuruomino(Problem):
                         ((x, y) in positions or board.get_value(x, y) in "LITS")
                         for (x, y) in square
                     ):
-                        return True
-        return False
+                        return True  # Um bloco 2x2 seria formado
+        return False  # Nenhum bloco 2x2 seria formado
 
     def _would_touch_equal_piece(self, positions, piece_letter, board: Board):
         for (i, j) in positions:
@@ -673,30 +738,30 @@ if __name__ == "__main__":
         print(f" - Região {region_id}: {len(positions)} células")
 
     # Aplicamos peças nas regiões com 4 células
-    board = preenche_regioes_de_4_celulas(board, problem)
+    # board = preenche_regioes_de_4_celulas(board, problem)
 
     #Atribuir novamente a cópia original ao novo board criado
-    board.regiao_original = original_board_copy
+    # board.regiao_original = original_board_copy
 
-    print("\nTabuleiro após preencher todas as regiões de 4 células:")
-    board.print_instance()
+    # print("\nTabuleiro após preencher todas as regiões de 4 células:")
+    # board.print_instance()
 
-    print("\nAções válidas no estado atual:")
-    state_temp = NuruominoState(board)
-    for action in problem.actions(state_temp):
-        region_id, piece, shape, index, shape_abs = action
-        print(f"Região {region_id} -> peça {piece} com forma {shape} na posição {shape_abs}")
+    # print("\nAções válidas no estado atual:")
+    # state_temp = NuruominoState(board)
+    # for action in problem.actions(state_temp):
+    #     region_id, piece, shape, index, shape_abs = action
+    #     print(f"Região {region_id} -> peça {piece} com forma {shape} na posição {shape_abs}")
 
-    # Marcar células deduzidas por interseção de possibilidades
-    print("\nMarcar células comuns nas regiões restantes:")
-    marcar_celulas_comuns(board, problem)
-    board.print_instance()
+    # # Marcar células deduzidas por interseção de possibilidades
+    # print("\nMarcar células comuns nas regiões restantes:")
+    # marcar_celulas_comuns(board, problem)
+    # board.print_instance()
 
-    # We use the ? to help us filter the actions, after that help they´re no longer needed
-    # therefore we turn them back to numbers to get the new list of actions
-    print("\nTabuleiro apos limpar celulas '?':")
-    limpar_celulas_interrogacao(board)
-    board.print_instance()
+    # # We use the ? to help us filter the actions, after that help they´re no longer needed
+    # # therefore we turn them back to numbers to get the new list of actions
+    # print("\nTabuleiro apos limpar celulas '?':")
+    # limpar_celulas_interrogacao(board)
+    # board.print_instance()
 
     # Criamos o novo estado inicial com as peças já aplicadas
     state = NuruominoState(board)
@@ -714,7 +779,7 @@ if __name__ == "__main__":
     # board.print_instance()
 
     instrumented = InstrumentedProblem(problem)
-    #goal_node = astar_search(instrumented)
+    # goal_node = astar_search(instrumented)
 
     goal_node = breadth_first_graph_search(instrumented)
     print("A testar com BFS...")
