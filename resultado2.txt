@@ -1,46 +1,52 @@
 Grelha lida do input:
-1	1	1	1	2	2	3	3	3	3
-1	4	5	6	2	2	7	8	9	3
-4	4	5	6	6	2	7	8	9	9
-4	5	5	10	6	2	7	8	8	9
-4	5	11	10	6	2	7	12	8	9
-4	5	11	10	10	2	7	12	8	9
-4	5	11	11	10	7	7	12	8	13
-4	5	13	11	10	7	12	12	8	13
-4	5	13	11	10	12	12	13	8	13
-4	5	13	13	13	13	13	13	13	13
+1	1	1	1	1	1	2	3	3	4	4	4
+1	2	2	2	2	2	2	5	3	3	3	4
+1	2	6	6	7	7	8	5	5	5	3	4
+1	2	7	6	6	7	8	9	10	5	3	4
+1	2	7	6	7	7	8	9	10	5	5	4
+1	2	7	7	7	7	8	9	10	11	5	12
+13	14	14	8	8	8	8	9	10	11	15	12
+13	16	14	9	9	9	9	9	10	11	15	12
+13	16	14	10	10	10	10	10	10	11	15	12
+13	16	14	14	14	14	11	11	11	11	15	12
+13	16	16	16	16	14	15	15	15	15	15	12
+13	13	13	13	13	13	12	12	12	12	12	12
 
 Número de células por região:
- - Região 1: 5 células
- - Região 2: 8 células
- - Região 3: 5 células
- - Região 4: 10 células
- - Região 5: 10 células
+ - Região 1: 11 células
+ - Região 2: 11 células
+ - Região 3: 7 células
+ - Região 4: 7 células
+ - Região 5: 8 células
  - Região 6: 5 células
- - Região 7: 8 células
- - Região 8: 9 células
- - Região 9: 6 células
- - Região 10: 7 células
- - Região 11: 6 células
- - Região 12: 7 células
- - Região 13: 14 células
+ - Região 7: 11 células
+ - Região 8: 8 células
+ - Região 9: 9 células
+ - Região 10: 11 células
+ - Região 11: 8 células
+ - Região 12: 12 células
+ - Região 13: 11 células
+ - Região 14: 9 células
+ - Região 15: 9 células
+ - Região 16: 7 células
 
 Ações válidas no estado atual:
-[DEBUG] Região 1 tem 2 ações possíveis (restrita, devolve já)
-Região 1 -> peça L com forma [(0, 0), (-1, 0), (-1, 1), (-1, 2)] na posição [(1, 0), (0, 0), (0, 1), (0, 2)]
-Região 1 -> peça I com forma [(0, 0), (0, 1), (0, 2), (0, 3)] na posição [(0, 0), (0, 1), (0, 2), (0, 3)]
+Região 3 -> peça L com forma [(0, 0), (1, 0), (1, 1), (1, 2)] na posição [(0, 8), (1, 8), (1, 9), (1, 10)]
+Região 3 -> peça S com forma [(0, 0), (0, -1), (-1, -1), (-1, -2)] na posição [(1, 9), (1, 8), (0, 8), (0, 7)]
 
 [DEBUG] Estado atual do tabuleiro:
-1	1	1	1	2	2	3	3	3	3
-1	4	5	6	2	2	7	8	9	3
-4	4	5	6	6	2	7	8	9	9
-4	5	5	10	6	2	7	8	8	9
-4	5	11	10	6	2	7	12	8	9
-4	5	11	10	10	2	7	12	8	9
-4	5	11	11	10	7	7	12	8	13
-4	5	13	11	10	7	12	12	8	13
-4	5	13	11	10	12	12	13	8	13
-4	5	13	13	13	13	13	13	13	13
+1	1	1	1	1	1	2	3	3	4	4	4
+1	2	2	2	2	2	2	5	3	3	3	4
+1	2	6	6	7	7	8	5	5	5	3	4
+1	2	7	6	6	7	8	9	10	5	3	4
+1	2	7	6	7	7	8	9	10	5	5	4
+1	2	7	7	7	7	8	9	10	11	5	12
+13	14	14	8	8	8	8	9	10	11	15	12
+13	16	14	9	9	9	9	9	10	11	15	12
+13	16	14	10	10	10	10	10	10	11	15	12
+13	16	14	14	14	14	11	11	11	11	15	12
+13	16	16	16	16	14	15	15	15	15	15	12
+13	13	13	13	13	13	12	12	12	12	12	12
 
 [DEBUG] Peças conectadas ortogonalmente:
 Total de peças conectadas: 0 / 0
@@ -50,19 +56,20 @@ Goal Test Results:
 - Sem blocos 2x2: True
 - Peças conectadas: True
 - Sem peças iguais adjacentes: True
-[DEBUG] Região 1 tem 2 ações possíveis (restrita, devolve já)
 
 [DEBUG] Estado atual do tabuleiro:
-I	I	I	I	2	2	3	3	3	3
-1	4	5	6	2	2	7	8	9	3
-4	4	5	6	6	2	7	8	9	9
-4	5	5	10	6	2	7	8	8	9
-4	5	11	10	6	2	7	12	8	9
-4	5	11	10	10	2	7	12	8	9
-4	5	11	11	10	7	7	12	8	13
-4	5	13	11	10	7	12	12	8	13
-4	5	13	11	10	12	12	13	8	13
-4	5	13	13	13	13	13	13	13	13
+1	1	1	1	1	1	2	S	S	4	4	4
+1	2	2	2	2	2	2	5	S	S	3	4
+1	2	6	6	7	7	8	5	5	X	3	4
+1	2	7	6	6	7	8	9	10	5	3	4
+1	2	7	6	7	7	8	9	10	5	5	4
+1	2	7	7	7	7	8	9	10	11	5	12
+13	14	14	8	8	8	8	9	10	11	15	12
+13	16	14	9	9	9	9	9	10	11	15	12
+13	16	14	10	10	10	10	10	10	11	15	12
+13	16	14	14	14	14	11	11	11	11	15	12
+13	16	16	16	16	14	15	15	15	15	15	12
+13	13	13	13	13	13	12	12	12	12	12	12
 
 [DEBUG] Peças conectadas ortogonalmente:
 Total de peças conectadas: 4 / 4
@@ -72,19 +79,667 @@ Goal Test Results:
 - Sem blocos 2x2: True
 - Peças conectadas: True
 - Sem peças iguais adjacentes: True
-[DEBUG] Região 2 tem 1 ações possíveis (restrita, devolve já)
 
 [DEBUG] Estado atual do tabuleiro:
-I	I	I	I	L	L	3	3	3	3
-1	4	5	6	X	L	7	8	9	3
-4	4	5	6	6	L	7	8	9	9
-4	5	5	10	6	2	7	8	8	9
-4	5	11	10	6	2	7	12	8	9
-4	5	11	10	10	2	7	12	8	9
-4	5	11	11	10	7	7	12	8	13
-4	5	13	11	10	7	12	12	8	13
-4	5	13	11	10	12	12	13	8	13
-4	5	13	13	13	13	13	13	13	13
+1	1	1	1	1	X	L	S	S	4	4	4
+1	2	2	2	L	L	L	5	S	S	3	4
+1	2	6	6	7	7	8	5	5	X	3	4
+1	2	7	6	6	7	8	9	10	5	3	4
+1	2	7	6	7	7	8	9	10	5	5	4
+1	2	7	7	7	7	8	9	10	11	5	12
+13	14	14	8	8	8	8	9	10	11	15	12
+13	16	14	9	9	9	9	9	10	11	15	12
+13	16	14	10	10	10	10	10	10	11	15	12
+13	16	14	14	14	14	11	11	11	11	15	12
+13	16	16	16	16	14	15	15	15	15	15	12
+13	13	13	13	13	13	12	12	12	12	12	12
+
+[DEBUG] Peças conectadas ortogonalmente:
+  -> L conectado a S
+Total de peças conectadas: 8 / 8
+
+Goal Test Results:
+- Todas regiões têm peça: False
+- Sem blocos 2x2: True
+- Peças conectadas: True
+- Sem peças iguais adjacentes: True
+
+[DEBUG] Estado atual do tabuleiro:
+1	1	1	1	1	X	L	S	S	4	L	L
+1	2	2	2	L	L	L	5	S	S	X	L
+1	2	6	6	7	7	8	5	5	X	3	L
+1	2	7	6	6	7	8	9	10	5	3	4
+1	2	7	6	7	7	8	9	10	5	5	4
+1	2	7	7	7	7	8	9	10	11	5	12
+13	14	14	8	8	8	8	9	10	11	15	12
+13	16	14	9	9	9	9	9	10	11	15	12
+13	16	14	10	10	10	10	10	10	11	15	12
+13	16	14	14	14	14	11	11	11	11	15	12
+13	16	16	16	16	14	15	15	15	15	15	12
+13	13	13	13	13	13	12	12	12	12	12	12
+
+[DEBUG] Peças conectadas ortogonalmente:
+  -> L conectado a S
+Total de peças conectadas: 8 / 12
+
+Goal Test Results:
+- Todas regiões têm peça: False
+- Sem blocos 2x2: True
+- Peças conectadas: False
+- Sem peças iguais adjacentes: True
+
+[DEBUG] Estado atual do tabuleiro:
+1	1	1	1	1	X	L	S	S	4	L	L
+1	2	2	2	L	L	L	5	S	S	X	L
+1	2	6	T	X	7	8	5	5	X	3	L
+1	2	7	T	T	7	8	9	10	5	3	4
+1	2	7	T	X	7	8	9	10	5	5	4
+1	2	7	7	7	7	8	9	10	11	5	12
+13	14	14	8	8	8	8	9	10	11	15	12
+13	16	14	9	9	9	9	9	10	11	15	12
+13	16	14	10	10	10	10	10	10	11	15	12
+13	16	14	14	14	14	11	11	11	11	15	12
+13	16	16	16	16	14	15	15	15	15	15	12
+13	13	13	13	13	13	12	12	12	12	12	12
+
+[DEBUG] Peças conectadas ortogonalmente:
+  -> L conectado a S
+Total de peças conectadas: 8 / 16
+
+Goal Test Results:
+- Todas regiões têm peça: False
+- Sem blocos 2x2: True
+- Peças conectadas: False
+- Sem peças iguais adjacentes: True
+
+[DEBUG] Estado atual do tabuleiro:
+1	1	1	1	1	X	L	S	S	4	L	L
+1	2	2	2	L	L	L	5	S	S	X	L
+1	2	6	T	X	7	8	5	5	X	3	L
+1	2	7	T	T	7	8	9	10	5	3	4
+1	2	7	T	X	7	8	9	10	5	5	4
+1	2	7	7	7	7	8	9	10	11	5	12
+13	14	14	8	8	8	8	9	10	11	15	12
+13	16	14	9	9	9	9	9	10	11	15	12
+13	16	14	10	10	10	10	10	10	11	15	12
+13	16	14	14	14	14	11	11	11	11	15	12
+13	16	16	16	16	14	15	15	15	15	15	12
+13	13	I	I	I	I	12	12	12	12	12	12
+
+[DEBUG] Peças conectadas ortogonalmente:
+  -> L conectado a S
+Total de peças conectadas: 8 / 20
+
+Goal Test Results:
+- Todas regiões têm peça: False
+- Sem blocos 2x2: True
+- Peças conectadas: False
+- Sem peças iguais adjacentes: True
+
+[DEBUG] Estado atual do tabuleiro:
+1	1	1	1	1	X	L	S	S	4	L	L
+1	2	2	2	L	L	L	5	S	S	X	L
+1	2	6	T	X	7	8	5	5	X	3	L
+1	2	7	T	T	7	8	9	10	5	3	4
+1	2	7	T	X	7	8	9	10	5	5	4
+1	2	7	7	7	7	8	9	10	11	5	12
+13	14	14	8	8	8	8	9	10	11	15	12
+13	16	14	9	9	9	9	9	10	11	15	12
+13	16	14	10	10	10	10	10	10	11	15	12
+13	16	14	L	L	L	11	11	11	11	15	12
+13	16	16	16	X	L	15	15	15	15	15	12
+13	13	I	I	I	I	12	12	12	12	12	12
+
+[DEBUG] Peças conectadas ortogonalmente:
+  -> L conectado a S
+Total de peças conectadas: 8 / 24
+
+Goal Test Results:
+- Todas regiões têm peça: False
+- Sem blocos 2x2: True
+- Peças conectadas: False
+- Sem peças iguais adjacentes: True
+
+[DEBUG] Estado atual do tabuleiro:
+1	1	1	1	1	X	L	S	S	4	L	L
+1	2	2	2	L	L	L	5	S	S	X	L
+1	2	6	T	X	7	8	5	5	X	3	L
+1	2	7	T	T	7	8	9	10	5	3	4
+1	2	7	T	X	7	8	9	10	5	5	4
+1	2	7	7	7	7	8	9	10	11	5	12
+13	14	14	8	8	8	8	9	10	11	15	12
+13	16	14	9	9	9	9	9	10	11	15	12
+13	16	14	10	10	10	10	10	10	11	15	12
+13	16	14	L	L	L	11	11	11	11	15	12
+13	16	16	16	X	L	I	I	I	I	15	12
+13	13	I	I	I	I	12	12	12	12	12	12
+
+[DEBUG] Peças conectadas ortogonalmente:
+  -> L conectado a S
+Total de peças conectadas: 8 / 28
+
+Goal Test Results:
+- Todas regiões têm peça: False
+- Sem blocos 2x2: True
+- Peças conectadas: False
+- Sem peças iguais adjacentes: True
+
+[DEBUG] Estado atual do tabuleiro:
+1	1	1	1	1	X	L	S	S	4	L	L
+1	2	2	2	L	L	L	5	S	S	X	L
+1	2	6	T	X	7	8	5	5	X	3	L
+1	2	7	T	T	7	8	9	10	5	3	4
+1	2	7	T	X	7	8	9	10	5	5	4
+1	2	7	7	7	7	8	9	10	11	5	12
+13	14	14	8	8	8	8	9	10	11	15	12
+13	16	14	9	9	9	9	9	10	11	15	12
+13	16	14	10	10	10	10	10	10	11	15	12
+13	16	14	L	L	L	11	11	11	11	15	L
+13	16	16	16	X	L	I	I	I	I	X	L
+13	13	I	I	I	I	12	12	12	12	L	L
+
+[DEBUG] Peças conectadas ortogonalmente:
+  -> L conectado a S
+Total de peças conectadas: 8 / 32
+
+Goal Test Results:
+- Todas regiões têm peça: False
+- Sem blocos 2x2: True
+- Peças conectadas: False
+- Sem peças iguais adjacentes: True
+
+[DEBUG] Estado atual do tabuleiro:
+1	1	1	1	1	X	L	S	S	4	L	L
+1	2	2	2	L	L	L	5	S	S	X	L
+1	2	6	T	X	7	8	5	5	X	3	L
+1	2	7	T	T	7	8	9	10	5	3	4
+1	2	7	T	X	7	8	9	10	5	5	4
+1	2	7	7	7	7	8	9	10	11	5	12
+13	14	14	8	8	8	8	9	10	11	15	12
+13	16	14	9	9	9	9	9	10	11	15	12
+13	L	14	10	10	10	10	10	10	11	15	12
+13	L	X	L	L	L	11	11	11	11	15	L
+13	L	L	16	X	L	I	I	I	I	X	L
+13	13	I	I	I	I	12	12	12	12	L	L
+
+[DEBUG] Peças conectadas ortogonalmente:
+  -> L conectado a S
+Total de peças conectadas: 8 / 36
+
+Goal Test Results:
+- Todas regiões têm peça: False
+- Sem blocos 2x2: True
+- Peças conectadas: False
+- Sem peças iguais adjacentes: True
+
+[DEBUG] Estado atual do tabuleiro:
+1	1	1	1	1	X	L	S	S	4	L	L
+1	2	2	2	L	L	L	5	S	S	X	L
+1	2	6	T	X	7	8	5	5	X	3	L
+1	2	7	T	T	7	8	9	10	5	3	4
+1	2	7	T	X	7	8	9	10	5	5	4
+1	2	7	7	7	7	8	9	10	11	5	12
+13	14	14	8	8	8	8	9	10	11	15	12
+13	16	14	9	I	I	I	I	10	11	15	12
+13	L	14	10	10	10	10	10	10	11	15	12
+13	L	X	L	L	L	11	11	11	11	15	L
+13	L	L	16	X	L	I	I	I	I	X	L
+13	13	I	I	I	I	12	12	12	12	L	L
+
+[DEBUG] Peças conectadas ortogonalmente:
+  -> L conectado a S
+Total de peças conectadas: 8 / 40
+
+Goal Test Results:
+- Todas regiões têm peça: False
+- Sem blocos 2x2: True
+- Peças conectadas: False
+- Sem peças iguais adjacentes: True
+
+[DEBUG] Estado atual do tabuleiro:
+1	1	1	1	1	X	L	S	S	4	L	L
+1	2	2	2	L	L	L	5	S	S	X	L
+1	2	6	T	X	7	8	5	5	X	3	L
+1	2	7	T	T	7	8	9	10	5	3	4
+1	2	7	T	X	7	8	9	10	5	5	4
+1	2	7	7	7	7	8	9	10	11	5	12
+13	14	14	8	8	8	8	9	10	11	15	12
+13	16	14	I	I	I	I	9	10	11	15	12
+13	L	14	10	10	10	10	10	10	11	15	12
+13	L	X	L	L	L	11	11	11	11	15	L
+13	L	L	16	X	L	I	I	I	I	X	L
+13	13	I	I	I	I	12	12	12	12	L	L
+
+[DEBUG] Peças conectadas ortogonalmente:
+  -> L conectado a S
+Total de peças conectadas: 8 / 40
+
+Goal Test Results:
+- Todas regiões têm peça: False
+- Sem blocos 2x2: True
+- Peças conectadas: False
+- Sem peças iguais adjacentes: True
+
+[DEBUG] Estado atual do tabuleiro:
+1	1	1	1	1	X	L	S	S	4	L	L
+1	2	2	2	L	L	L	5	S	S	X	L
+1	2	6	T	X	7	8	5	5	X	3	L
+1	2	7	T	T	7	8	9	10	5	3	4
+1	2	7	T	X	7	8	9	10	5	5	4
+1	2	7	7	7	7	8	9	10	11	5	12
+13	14	14	8	8	8	X	L	10	11	15	12
+13	16	14	9	9	L	L	L	10	11	15	12
+13	L	14	10	10	10	10	10	10	11	15	12
+13	L	X	L	L	L	11	11	11	11	15	L
+13	L	L	16	X	L	I	I	I	I	X	L
+13	13	I	I	I	I	12	12	12	12	L	L
+
+[DEBUG] Peças conectadas ortogonalmente:
+  -> L conectado a S
+Total de peças conectadas: 8 / 40
+
+Goal Test Results:
+- Todas regiões têm peça: False
+- Sem blocos 2x2: True
+- Peças conectadas: False
+- Sem peças iguais adjacentes: True
+
+[DEBUG] Estado atual do tabuleiro:
+1	1	1	1	1	X	L	S	S	4	L	L
+1	2	2	2	L	L	L	5	S	S	X	L
+1	2	6	T	X	7	8	5	5	X	3	L
+1	2	7	T	T	7	8	9	10	5	3	4
+1	2	7	T	X	7	8	9	10	5	5	4
+1	2	7	7	7	7	8	9	10	11	5	12
+I	14	14	8	8	8	8	9	10	11	15	12
+I	16	14	9	9	9	9	9	10	11	15	12
+I	16	14	10	10	10	10	10	10	11	15	12
+I	16	14	14	14	14	11	11	11	11	15	12
+13	16	16	16	16	14	15	15	15	15	15	12
+13	13	13	13	13	13	12	12	12	12	12	12
+
+[DEBUG] Peças conectadas ortogonalmente:
+  -> L conectado a S
+Total de peças conectadas: 8 / 20
+
+Goal Test Results:
+- Todas regiões têm peça: False
+- Sem blocos 2x2: True
+- Peças conectadas: False
+- Sem peças iguais adjacentes: True
+
+[DEBUG] Estado atual do tabuleiro:
+1	1	1	1	1	X	L	S	S	4	L	L
+1	2	2	2	L	L	L	5	S	S	X	L
+1	2	6	T	X	7	8	5	5	X	3	L
+1	2	7	T	T	7	8	9	10	5	3	4
+1	2	7	T	X	7	8	9	10	5	5	4
+1	2	7	7	7	7	8	9	10	11	5	12
+I	L	L	8	8	8	8	9	10	11	15	12
+I	X	L	9	9	9	9	9	10	11	15	12
+I	16	L	10	10	10	10	10	10	11	15	12
+I	16	14	14	14	14	11	11	11	11	15	12
+13	16	16	16	16	14	15	15	15	15	15	12
+13	13	13	13	13	13	12	12	12	12	12	12
+
+[DEBUG] Peças conectadas ortogonalmente:
+  -> L conectado a S
+Total de peças conectadas: 8 / 24
+
+Goal Test Results:
+- Todas regiões têm peça: False
+- Sem blocos 2x2: True
+- Peças conectadas: False
+- Sem peças iguais adjacentes: True
+
+[DEBUG] Estado atual do tabuleiro:
+1	1	1	1	1	X	L	S	S	4	L	L
+1	2	2	2	L	L	L	5	S	S	X	L
+1	2	6	T	X	7	8	5	5	X	3	L
+1	2	7	T	T	7	8	9	10	5	3	4
+1	2	7	T	X	7	8	9	10	5	5	4
+1	2	7	7	7	7	8	9	10	11	5	12
+I	L	L	8	8	8	8	9	10	11	15	12
+I	X	L	I	I	I	I	9	10	11	15	12
+I	16	L	10	10	10	10	10	10	11	15	12
+I	16	14	14	14	14	11	11	11	11	15	12
+13	16	16	16	16	14	15	15	15	15	15	12
+13	13	13	13	13	13	12	12	12	12	12	12
+
+[DEBUG] Peças conectadas ortogonalmente:
+  -> L conectado a S
+Total de peças conectadas: 8 / 28
+
+Goal Test Results:
+- Todas regiões têm peça: False
+- Sem blocos 2x2: True
+- Peças conectadas: False
+- Sem peças iguais adjacentes: True
+
+[DEBUG] Estado atual do tabuleiro:
+1	1	1	1	1	X	L	S	S	4	L	L
+1	2	2	2	L	L	L	5	S	S	X	L
+1	2	6	T	X	7	8	5	5	X	3	L
+1	2	7	T	T	7	8	9	10	5	3	4
+1	2	7	T	X	7	8	9	10	5	5	4
+1	2	7	7	7	7	8	9	10	11	5	12
+I	L	L	8	8	8	8	9	10	11	15	12
+I	X	L	I	I	I	I	9	10	11	15	12
+I	16	L	10	10	10	10	10	10	11	15	12
+I	16	14	14	14	14	11	11	11	11	15	12
+13	I	I	I	I	14	15	15	15	15	15	12
+13	13	13	13	13	13	12	12	12	12	12	12
+
+[DEBUG] Peças conectadas ortogonalmente:
+  -> L conectado a S
+Total de peças conectadas: 8 / 32
+
+Goal Test Results:
+- Todas regiões têm peça: False
+- Sem blocos 2x2: True
+- Peças conectadas: False
+- Sem peças iguais adjacentes: True
+
+[DEBUG] Estado atual do tabuleiro:
+1	1	1	1	1	X	L	S	S	4	L	L
+1	2	2	2	L	L	L	5	S	S	X	L
+1	2	6	T	X	7	8	5	5	X	3	L
+1	2	7	T	T	7	8	9	10	5	3	4
+1	2	7	T	X	7	8	9	10	5	5	4
+1	2	7	7	7	7	8	9	10	11	5	12
+I	L	L	8	8	8	8	9	10	11	15	12
+I	X	L	I	I	I	I	9	10	11	15	12
+I	16	L	10	10	10	10	10	10	11	15	12
+I	16	14	14	14	14	11	11	11	11	15	12
+13	I	I	I	I	14	15	I	I	I	I	12
+13	13	13	13	13	13	12	12	12	12	12	12
+
+[DEBUG] Peças conectadas ortogonalmente:
+  -> L conectado a S
+Total de peças conectadas: 8 / 36
+
+Goal Test Results:
+- Todas regiões têm peça: False
+- Sem blocos 2x2: True
+- Peças conectadas: False
+- Sem peças iguais adjacentes: True
+
+[DEBUG] Estado atual do tabuleiro:
+1	1	1	1	1	X	L	S	S	4	L	L
+1	2	2	2	L	L	L	5	S	S	X	L
+1	2	6	T	X	7	8	5	5	X	3	L
+1	2	7	T	T	7	8	9	10	5	3	4
+1	2	7	T	X	7	8	9	10	5	5	4
+1	2	7	7	7	7	8	9	10	11	5	12
+I	L	L	8	8	8	8	9	10	11	15	12
+I	X	L	I	I	I	I	9	10	11	15	12
+I	16	L	10	10	10	10	10	10	11	15	12
+I	16	14	14	14	14	11	11	11	11	15	12
+13	I	I	I	I	14	I	I	I	I	15	12
+13	13	13	13	13	13	12	12	12	12	12	12
+
+[DEBUG] Peças conectadas ortogonalmente:
+  -> L conectado a S
+Total de peças conectadas: 8 / 36
+
+Goal Test Results:
+- Todas regiões têm peça: False
+- Sem blocos 2x2: True
+- Peças conectadas: False
+- Sem peças iguais adjacentes: True
+
+[DEBUG] Estado atual do tabuleiro:
+1	1	1	1	1	X	L	S	S	4	L	L
+1	2	2	2	L	L	L	5	S	S	X	L
+1	2	6	T	X	7	8	5	5	X	3	L
+1	2	7	T	T	7	8	9	10	5	3	4
+1	2	7	T	X	7	8	9	10	5	5	4
+1	2	7	7	7	7	8	9	10	11	5	12
+I	L	L	8	8	8	8	9	10	11	15	12
+I	X	L	I	I	I	I	9	10	11	15	12
+I	16	L	10	10	10	10	10	10	11	15	12
+I	16	14	14	14	14	11	11	11	11	15	L
+13	I	I	I	I	14	I	I	I	I	X	L
+13	13	13	13	13	13	12	12	12	12	L	L
+
+[DEBUG] Peças conectadas ortogonalmente:
+  -> L conectado a S
+Total de peças conectadas: 8 / 40
+
+Goal Test Results:
+- Todas regiões têm peça: False
+- Sem blocos 2x2: True
+- Peças conectadas: False
+- Sem peças iguais adjacentes: True
+
+[DEBUG] Estado atual do tabuleiro:
+1	1	1	1	1	X	L	S	S	4	L	L
+1	2	2	2	L	L	L	5	S	S	X	L
+1	2	6	T	X	7	8	5	5	X	3	L
+1	2	7	T	T	7	8	9	10	5	3	4
+1	2	7	T	X	7	8	9	10	5	5	4
+1	2	7	7	7	7	8	9	10	11	5	12
+I	L	L	8	8	8	8	9	10	11	15	12
+I	X	L	I	I	I	I	9	10	11	15	12
+I	16	L	10	10	10	10	10	10	11	15	12
+I	16	14	14	14	14	11	11	11	X	L	12
+13	I	I	I	I	14	15	15	L	L	L	12
+13	13	13	13	13	13	12	12	12	12	12	12
+
+[DEBUG] Peças conectadas ortogonalmente:
+  -> L conectado a S
+Total de peças conectadas: 8 / 36
+
+Goal Test Results:
+- Todas regiões têm peça: False
+- Sem blocos 2x2: True
+- Peças conectadas: False
+- Sem peças iguais adjacentes: True
+
+[DEBUG] Estado atual do tabuleiro:
+1	1	1	1	1	X	L	S	S	4	L	L
+1	2	2	2	L	L	L	5	S	S	X	L
+1	2	6	T	X	7	8	5	5	X	3	L
+1	2	7	T	T	7	8	9	10	5	3	4
+1	2	7	T	X	7	8	9	10	5	5	4
+1	2	7	7	7	7	8	9	10	11	5	12
+I	L	L	8	8	8	8	9	10	11	15	12
+I	X	L	I	I	I	I	9	10	11	15	12
+I	16	L	10	10	10	10	10	10	11	L	12
+I	16	14	14	14	14	11	11	11	X	L	12
+13	I	I	I	I	14	15	15	15	L	L	12
+13	13	13	13	13	13	12	12	12	12	12	12
+
+[DEBUG] Peças conectadas ortogonalmente:
+  -> L conectado a S
+Total de peças conectadas: 8 / 36
+
+Goal Test Results:
+- Todas regiões têm peça: False
+- Sem blocos 2x2: True
+- Peças conectadas: False
+- Sem peças iguais adjacentes: True
+
+[DEBUG] Estado atual do tabuleiro:
+1	1	1	1	1	X	L	S	S	4	L	L
+1	2	2	2	L	L	L	5	S	S	X	L
+1	2	6	T	X	7	8	5	5	X	3	L
+1	2	7	T	T	7	8	9	10	5	3	4
+1	2	7	T	X	7	8	9	10	5	5	4
+1	2	7	7	7	7	8	9	10	11	5	12
+I	L	L	8	8	8	8	9	10	11	15	12
+I	X	L	I	I	I	I	9	10	11	15	12
+I	16	L	10	10	10	10	10	10	11	15	12
+I	L	X	14	14	14	11	11	11	11	15	12
+13	L	L	L	16	14	15	15	15	15	15	12
+13	13	13	13	13	13	12	12	12	12	12	12
+
+[DEBUG] Peças conectadas ortogonalmente:
+  -> L conectado a S
+Total de peças conectadas: 8 / 32
+
+Goal Test Results:
+- Todas regiões têm peça: False
+- Sem blocos 2x2: True
+- Peças conectadas: False
+- Sem peças iguais adjacentes: True
+
+[DEBUG] Estado atual do tabuleiro:
+1	1	1	1	1	X	L	S	S	4	L	L
+1	2	2	2	L	L	L	5	S	S	X	L
+1	2	6	T	X	7	8	5	5	X	3	L
+1	2	7	T	T	7	8	9	10	5	3	4
+1	2	7	T	X	7	8	9	10	5	5	4
+1	2	7	7	7	7	8	9	10	11	5	12
+I	L	L	8	8	8	8	9	10	11	15	12
+I	X	L	I	I	I	I	9	10	11	15	12
+I	16	L	10	10	10	10	10	10	11	15	12
+I	L	X	14	14	14	11	11	11	11	15	12
+13	L	L	L	16	14	15	I	I	I	I	12
+13	13	13	13	13	13	12	12	12	12	12	12
+
+[DEBUG] Peças conectadas ortogonalmente:
+  -> L conectado a S
+Total de peças conectadas: 8 / 36
+
+Goal Test Results:
+- Todas regiões têm peça: False
+- Sem blocos 2x2: True
+- Peças conectadas: False
+- Sem peças iguais adjacentes: True
+
+[DEBUG] Estado atual do tabuleiro:
+1	1	1	1	1	X	L	S	S	4	L	L
+1	2	2	2	L	L	L	5	S	S	X	L
+1	2	6	T	X	7	8	5	5	X	3	L
+1	2	7	T	T	7	8	9	10	5	3	4
+1	2	7	T	X	7	8	9	10	5	5	4
+1	2	7	7	7	7	8	9	10	11	5	12
+I	L	L	8	8	8	8	9	10	11	15	12
+I	X	L	I	I	I	I	9	10	11	15	12
+I	16	L	10	10	10	10	10	10	11	15	12
+I	L	X	14	14	14	11	11	11	11	15	12
+13	L	L	L	16	14	I	I	I	I	15	12
+13	13	13	13	13	13	12	12	12	12	12	12
+
+[DEBUG] Peças conectadas ortogonalmente:
+  -> L conectado a S
+Total de peças conectadas: 8 / 36
+
+Goal Test Results:
+- Todas regiões têm peça: False
+- Sem blocos 2x2: True
+- Peças conectadas: False
+- Sem peças iguais adjacentes: True
+
+[DEBUG] Estado atual do tabuleiro:
+1	1	1	1	1	X	L	S	S	4	L	L
+1	2	2	2	L	L	L	5	S	S	X	L
+1	2	6	T	X	7	8	5	5	X	3	L
+1	2	7	T	T	7	8	9	10	5	3	4
+1	2	7	T	X	7	8	9	10	5	5	4
+1	2	7	7	7	7	8	9	10	11	5	12
+I	L	L	8	8	8	8	9	10	11	15	12
+I	X	L	I	I	I	I	9	10	11	15	12
+I	16	L	10	10	10	10	10	10	11	15	12
+I	L	X	14	14	14	11	11	11	11	15	L
+13	L	L	L	16	14	I	I	I	I	X	L
+13	13	13	13	13	13	12	12	12	12	L	L
+
+[DEBUG] Peças conectadas ortogonalmente:
+  -> L conectado a S
+Total de peças conectadas: 8 / 40
+
+Goal Test Results:
+- Todas regiões têm peça: False
+- Sem blocos 2x2: True
+- Peças conectadas: False
+- Sem peças iguais adjacentes: True
+
+[DEBUG] Estado atual do tabuleiro:
+1	1	1	1	1	X	L	S	S	4	L	L
+1	2	2	2	L	L	L	5	S	S	X	L
+1	2	6	T	X	7	8	5	5	X	3	L
+1	2	7	T	T	7	8	9	10	5	3	4
+1	2	7	T	X	7	8	9	10	5	5	4
+1	2	7	7	7	7	8	9	10	11	5	12
+I	L	L	8	8	8	8	9	10	11	15	12
+I	X	L	I	I	I	I	9	10	11	15	12
+I	16	L	10	10	10	10	10	10	11	15	12
+I	L	X	14	14	14	11	11	11	X	L	12
+13	L	L	L	16	14	15	15	L	L	L	12
+13	13	13	13	13	13	12	12	12	12	12	12
+
+[DEBUG] Peças conectadas ortogonalmente:
+  -> L conectado a S
+Total de peças conectadas: 8 / 36
+
+Goal Test Results:
+- Todas regiões têm peça: False
+- Sem blocos 2x2: True
+- Peças conectadas: False
+- Sem peças iguais adjacentes: True
+
+[DEBUG] Estado atual do tabuleiro:
+1	1	1	1	1	X	L	S	S	4	L	L
+1	2	2	2	L	L	L	5	S	S	X	L
+1	2	6	T	X	7	8	5	5	X	3	L
+1	2	7	T	T	7	8	9	10	5	3	4
+1	2	7	T	X	7	8	9	10	5	5	4
+1	2	7	7	7	7	8	9	10	11	5	12
+I	L	L	8	8	8	8	9	10	11	15	12
+I	X	L	I	I	I	I	9	10	11	15	12
+I	16	L	10	10	10	10	10	10	11	L	12
+I	L	X	14	14	14	11	11	11	X	L	12
+13	L	L	L	16	14	15	15	15	L	L	12
+13	13	13	13	13	13	12	12	12	12	12	12
+
+[DEBUG] Peças conectadas ortogonalmente:
+  -> L conectado a S
+Total de peças conectadas: 8 / 36
+
+Goal Test Results:
+- Todas regiões têm peça: False
+- Sem blocos 2x2: True
+- Peças conectadas: False
+- Sem peças iguais adjacentes: True
+
+[DEBUG] Estado atual do tabuleiro:
+1	1	1	1	1	1	2	3	L	X	4	4
+1	2	2	2	2	2	2	5	L	L	L	4
+1	2	6	6	7	7	8	5	5	5	3	4
+1	2	7	6	6	7	8	9	10	5	3	4
+1	2	7	6	7	7	8	9	10	5	5	4
+1	2	7	7	7	7	8	9	10	11	5	12
+13	14	14	8	8	8	8	9	10	11	15	12
+13	16	14	9	9	9	9	9	10	11	15	12
+13	16	14	10	10	10	10	10	10	11	15	12
+13	16	14	14	14	14	11	11	11	11	15	12
+13	16	16	16	16	14	15	15	15	15	15	12
+13	13	13	13	13	13	12	12	12	12	12	12
+
+[DEBUG] Peças conectadas ortogonalmente:
+Total de peças conectadas: 4 / 4
+
+Goal Test Results:
+- Todas regiões têm peça: False
+- Sem blocos 2x2: True
+- Peças conectadas: True
+- Sem peças iguais adjacentes: True
+
+[DEBUG] Estado atual do tabuleiro:
+1	1	1	1	1	1	2	3	L	X	4	4
+1	2	2	2	2	2	2	5	L	L	L	I
+1	2	6	6	7	7	8	5	5	5	3	I
+1	2	7	6	6	7	8	9	10	5	3	I
+1	2	7	6	7	7	8	9	10	5	5	I
+1	2	7	7	7	7	8	9	10	11	5	12
+13	14	14	8	8	8	8	9	10	11	15	12
+13	16	14	9	9	9	9	9	10	11	15	12
+13	16	14	10	10	10	10	10	10	11	15	12
+13	16	14	14	14	14	11	11	11	11	15	12
+13	16	16	16	16	14	15	15	15	15	15	12
+13	13	13	13	13	13	12	12	12	12	12	12
 
 [DEBUG] Peças conectadas ortogonalmente:
   -> I conectado a L
@@ -95,512 +750,821 @@ Goal Test Results:
 - Sem blocos 2x2: True
 - Peças conectadas: True
 - Sem peças iguais adjacentes: True
-[DEBUG] Região 3 tem 2 ações possíveis (restrita, devolve já)
 
 [DEBUG] Estado atual do tabuleiro:
-I	I	I	I	L	L	I	I	I	I
-1	4	5	6	X	L	7	8	9	3
-4	4	5	6	6	L	7	8	9	9
-4	5	5	10	6	2	7	8	8	9
-4	5	11	10	6	2	7	12	8	9
-4	5	11	10	10	2	7	12	8	9
-4	5	11	11	10	7	7	12	8	13
-4	5	13	11	10	7	12	12	8	13
-4	5	13	11	10	12	12	13	8	13
-4	5	13	13	13	13	13	13	13	13
+1	1	1	1	1	1	2	3	L	X	4	4
+1	2	2	2	2	2	2	5	L	L	L	I
+1	2	6	6	7	7	I	5	5	5	3	I
+1	2	7	6	6	7	I	9	10	5	3	I
+1	2	7	6	7	7	I	9	10	5	5	I
+1	2	7	7	7	7	I	9	10	11	5	12
+13	14	14	8	8	8	8	9	10	11	15	12
+13	16	14	9	9	9	9	9	10	11	15	12
+13	16	14	10	10	10	10	10	10	11	15	12
+13	16	14	14	14	14	11	11	11	11	15	12
+13	16	16	16	16	14	15	15	15	15	15	12
+13	13	13	13	13	13	12	12	12	12	12	12
 
 [DEBUG] Peças conectadas ortogonalmente:
   -> I conectado a L
-Total de peças conectadas: 12 / 12
+Total de peças conectadas: 8 / 12
+
+Goal Test Results:
+- Todas regiões têm peça: False
+- Sem blocos 2x2: True
+- Peças conectadas: False
+- Sem peças iguais adjacentes: True
+
+[DEBUG] Estado atual do tabuleiro:
+1	1	1	1	1	1	2	3	L	X	4	4
+1	2	2	2	X	2	2	5	L	L	L	I
+1	2	S	S	7	7	I	5	5	5	3	I
+1	2	7	S	S	7	I	9	10	5	3	I
+1	2	7	6	X	7	I	9	10	5	5	I
+1	2	7	7	7	7	I	9	10	11	5	12
+13	14	14	8	8	8	8	9	10	11	15	12
+13	16	14	9	9	9	9	9	10	11	15	12
+13	16	14	10	10	10	10	10	10	11	15	12
+13	16	14	14	14	14	11	11	11	11	15	12
+13	16	16	16	16	14	15	15	15	15	15	12
+13	13	13	13	13	13	12	12	12	12	12	12
+
+[DEBUG] Peças conectadas ortogonalmente:
+  -> I conectado a L
+Total de peças conectadas: 8 / 16
+
+Goal Test Results:
+- Todas regiões têm peça: False
+- Sem blocos 2x2: True
+- Peças conectadas: False
+- Sem peças iguais adjacentes: True
+
+[DEBUG] Estado atual do tabuleiro:
+1	1	1	1	1	1	2	3	L	X	4	4
+1	I	2	2	X	2	2	5	L	L	L	I
+1	I	S	S	7	7	I	5	5	5	3	I
+1	I	7	S	S	7	I	9	10	5	3	I
+1	I	7	6	X	7	I	9	10	5	5	I
+1	2	7	7	7	7	I	9	10	11	5	12
+13	14	14	8	8	8	8	9	10	11	15	12
+13	16	14	9	9	9	9	9	10	11	15	12
+13	16	14	10	10	10	10	10	10	11	15	12
+13	16	14	14	14	14	11	11	11	11	15	12
+13	16	16	16	16	14	15	15	15	15	15	12
+13	13	13	13	13	13	12	12	12	12	12	12
+
+[DEBUG] Peças conectadas ortogonalmente:
+  -> I conectado a L
+Total de peças conectadas: 8 / 20
+
+Goal Test Results:
+- Todas regiões têm peça: False
+- Sem blocos 2x2: True
+- Peças conectadas: False
+- Sem peças iguais adjacentes: True
+
+[DEBUG] Estado atual do tabuleiro:
+1	1	I	I	I	I	2	3	L	X	4	4
+1	I	2	2	X	2	2	5	L	L	L	I
+1	I	S	S	7	7	I	5	5	5	3	I
+1	I	7	S	S	7	I	9	10	5	3	I
+1	I	7	6	X	7	I	9	10	5	5	I
+1	2	7	7	7	7	I	9	10	11	5	12
+13	14	14	8	8	8	8	9	10	11	15	12
+13	16	14	9	9	9	9	9	10	11	15	12
+13	16	14	10	10	10	10	10	10	11	15	12
+13	16	14	14	14	14	11	11	11	11	15	12
+13	16	16	16	16	14	15	15	15	15	15	12
+13	13	13	13	13	13	12	12	12	12	12	12
+
+[DEBUG] Peças conectadas ortogonalmente:
+Total de peças conectadas: 4 / 24
+
+Goal Test Results:
+- Todas regiões têm peça: False
+- Sem blocos 2x2: True
+- Peças conectadas: False
+- Sem peças iguais adjacentes: True
+
+[DEBUG] Estado atual do tabuleiro:
+1	1	I	I	I	I	2	3	L	X	4	4
+1	I	2	2	X	2	2	5	L	L	L	I
+1	I	S	S	7	7	I	5	5	5	3	I
+1	I	7	S	S	7	I	9	10	5	3	I
+1	I	L	X	X	7	I	9	10	5	5	I
+1	2	L	L	L	7	I	9	10	11	5	12
+13	14	14	8	8	8	8	9	10	11	15	12
+13	16	14	9	9	9	9	9	10	11	15	12
+13	16	14	10	10	10	10	10	10	11	15	12
+13	16	14	14	14	14	11	11	11	11	15	12
+13	16	16	16	16	14	15	15	15	15	15	12
+13	13	13	13	13	13	12	12	12	12	12	12
+
+[DEBUG] Peças conectadas ortogonalmente:
+Total de peças conectadas: 4 / 28
+
+Goal Test Results:
+- Todas regiões têm peça: False
+- Sem blocos 2x2: True
+- Peças conectadas: False
+- Sem peças iguais adjacentes: True
+
+[DEBUG] Estado atual do tabuleiro:
+1	1	I	I	I	I	2	3	L	X	4	4
+1	I	2	2	X	2	2	5	L	L	L	I
+1	I	S	S	7	7	I	5	5	5	3	I
+1	I	7	S	S	7	I	9	10	5	3	I
+1	I	L	X	X	7	I	9	10	5	5	I
+1	2	L	L	L	7	I	9	10	11	5	12
+13	14	14	8	8	8	X	L	10	11	15	12
+13	16	14	9	9	L	L	L	10	11	15	12
+13	16	14	10	10	10	10	10	10	11	15	12
+13	16	14	14	14	14	11	11	11	11	15	12
+13	16	16	16	16	14	15	15	15	15	15	12
+13	13	13	13	13	13	12	12	12	12	12	12
+
+[DEBUG] Peças conectadas ortogonalmente:
+Total de peças conectadas: 4 / 32
+
+Goal Test Results:
+- Todas regiões têm peça: False
+- Sem blocos 2x2: True
+- Peças conectadas: False
+- Sem peças iguais adjacentes: True
+
+[DEBUG] Estado atual do tabuleiro:
+1	1	I	I	I	I	2	3	L	X	4	4
+1	I	2	2	X	2	2	5	L	L	L	I
+1	I	S	S	7	7	I	5	5	5	3	I
+1	I	7	S	S	7	I	9	10	5	3	I
+1	I	L	X	X	7	I	9	10	5	5	I
+1	2	L	L	L	7	I	9	10	11	5	12
+13	14	14	8	8	8	X	L	10	11	15	12
+13	16	14	9	9	L	L	L	10	11	15	12
+13	16	14	10	10	10	10	10	10	11	15	12
+13	16	14	14	14	14	11	11	11	11	15	12
+13	16	16	16	16	14	15	15	15	15	15	12
+13	13	I	I	I	I	12	12	12	12	12	12
+
+[DEBUG] Peças conectadas ortogonalmente:
+Total de peças conectadas: 4 / 36
+
+Goal Test Results:
+- Todas regiões têm peça: False
+- Sem blocos 2x2: True
+- Peças conectadas: False
+- Sem peças iguais adjacentes: True
+
+[DEBUG] Estado atual do tabuleiro:
+1	1	I	I	I	I	2	3	L	X	4	4
+1	I	2	2	X	2	2	5	L	L	L	I
+1	I	S	S	7	7	I	5	5	5	3	I
+1	I	7	S	S	7	I	9	10	5	3	I
+1	I	L	X	X	7	I	9	10	5	5	I
+1	2	L	L	L	7	I	9	10	11	5	12
+13	14	14	8	8	8	X	L	10	11	15	12
+13	16	14	9	9	L	L	L	10	11	15	12
+13	16	14	10	10	10	10	10	10	11	15	12
+13	16	14	L	L	L	11	11	11	11	15	12
+13	16	16	16	X	L	15	15	15	15	15	12
+13	13	I	I	I	I	12	12	12	12	12	12
+
+[DEBUG] Peças conectadas ortogonalmente:
+Total de peças conectadas: 4 / 40
+
+Goal Test Results:
+- Todas regiões têm peça: False
+- Sem blocos 2x2: True
+- Peças conectadas: False
+- Sem peças iguais adjacentes: True
+
+[DEBUG] Estado atual do tabuleiro:
+1	1	I	I	I	I	2	3	L	X	4	4
+1	I	2	2	X	2	2	5	L	L	L	I
+1	I	S	S	7	7	I	5	5	5	3	I
+1	I	7	S	S	7	I	9	10	5	3	I
+1	I	L	X	X	7	I	9	10	5	5	I
+1	2	L	L	L	7	I	9	10	11	5	12
+13	14	14	8	8	8	X	L	10	11	15	12
+13	16	14	9	9	L	L	L	10	11	15	12
+13	16	14	10	10	10	10	10	10	11	15	12
+13	16	14	L	L	L	11	11	11	11	15	12
+13	16	16	16	X	L	I	I	I	I	15	12
+13	13	I	I	I	I	12	12	12	12	12	12
+
+[DEBUG] Peças conectadas ortogonalmente:
+Total de peças conectadas: 4 / 44
+
+Goal Test Results:
+- Todas regiões têm peça: False
+- Sem blocos 2x2: True
+- Peças conectadas: False
+- Sem peças iguais adjacentes: True
+
+[DEBUG] Estado atual do tabuleiro:
+1	1	I	I	I	I	2	3	L	X	4	4
+1	I	2	2	X	2	2	5	L	L	L	I
+1	I	S	S	7	7	I	5	5	5	3	I
+1	I	7	S	S	7	I	9	10	5	3	I
+1	I	L	X	X	7	I	9	10	5	5	I
+1	2	L	L	L	7	I	9	10	11	5	12
+13	14	14	8	8	8	X	L	10	11	15	12
+13	16	14	9	9	L	L	L	10	11	15	12
+13	16	14	10	10	10	10	10	10	11	15	12
+13	16	14	L	L	L	11	11	11	11	15	L
+13	16	16	16	X	L	I	I	I	I	X	L
+13	13	I	I	I	I	12	12	12	12	L	L
+
+[DEBUG] Peças conectadas ortogonalmente:
+Total de peças conectadas: 4 / 48
+
+Goal Test Results:
+- Todas regiões têm peça: False
+- Sem blocos 2x2: True
+- Peças conectadas: False
+- Sem peças iguais adjacentes: True
+
+[DEBUG] Estado atual do tabuleiro:
+1	1	I	I	I	I	2	3	L	X	4	4
+1	I	2	2	X	2	2	5	L	L	L	I
+1	I	S	S	7	7	I	5	5	5	3	I
+1	I	7	S	S	7	I	9	10	5	3	I
+1	I	L	X	X	7	I	9	10	5	5	I
+1	2	L	L	L	7	I	9	10	11	5	12
+13	14	14	8	8	8	X	L	10	11	15	12
+13	16	14	9	9	L	L	L	10	11	15	12
+13	L	14	10	10	10	10	10	10	11	15	12
+13	L	X	L	L	L	11	11	11	11	15	L
+13	L	L	16	X	L	I	I	I	I	X	L
+13	13	I	I	I	I	12	12	12	12	L	L
+
+[DEBUG] Peças conectadas ortogonalmente:
+Total de peças conectadas: 4 / 52
+
+Goal Test Results:
+- Todas regiões têm peça: False
+- Sem blocos 2x2: True
+- Peças conectadas: False
+- Sem peças iguais adjacentes: True
+
+[DEBUG] Estado atual do tabuleiro:
+1	1	I	I	I	I	2	3	L	X	4	4
+1	I	2	2	X	2	2	5	L	L	L	I
+1	I	S	S	7	7	I	5	5	5	3	I
+1	I	7	S	S	7	I	9	10	5	3	I
+1	I	L	X	X	7	I	9	10	5	5	I
+1	2	L	L	L	7	I	9	10	11	5	12
+I	14	14	8	8	8	X	L	10	11	15	12
+I	16	14	9	9	L	L	L	10	11	15	12
+I	16	14	10	10	10	10	10	10	11	15	12
+I	16	14	14	14	14	11	11	11	11	15	12
+13	16	16	16	16	14	15	15	15	15	15	12
+13	13	13	13	13	13	12	12	12	12	12	12
+
+[DEBUG] Peças conectadas ortogonalmente:
+Total de peças conectadas: 4 / 36
+
+Goal Test Results:
+- Todas regiões têm peça: False
+- Sem blocos 2x2: True
+- Peças conectadas: False
+- Sem peças iguais adjacentes: True
+
+[DEBUG] Estado atual do tabuleiro:
+1	1	I	I	I	I	2	3	L	X	4	4
+1	I	2	2	X	2	2	5	L	L	L	I
+1	I	S	S	7	7	I	5	5	5	3	I
+1	I	7	S	S	7	I	9	10	5	3	I
+1	I	L	X	X	7	I	9	10	5	5	I
+1	2	L	L	L	7	I	9	10	11	5	12
+I	14	14	8	8	8	X	L	10	11	15	12
+I	16	14	9	9	L	L	L	10	11	15	12
+I	16	14	10	10	10	10	10	10	11	15	12
+I	16	14	14	14	14	11	11	11	11	15	12
+13	16	16	16	16	14	15	I	I	I	I	12
+13	13	13	13	13	13	12	12	12	12	12	12
+
+[DEBUG] Peças conectadas ortogonalmente:
+Total de peças conectadas: 4 / 40
+
+Goal Test Results:
+- Todas regiões têm peça: False
+- Sem blocos 2x2: True
+- Peças conectadas: False
+- Sem peças iguais adjacentes: True
+
+[DEBUG] Estado atual do tabuleiro:
+1	1	I	I	I	I	2	3	L	X	4	4
+1	I	2	2	X	2	2	5	L	L	L	I
+1	I	S	S	7	7	I	5	5	5	3	I
+1	I	7	S	S	7	I	9	10	5	3	I
+1	I	L	X	X	7	I	9	10	5	5	I
+1	2	L	L	L	7	I	9	10	11	5	12
+I	14	14	8	8	8	X	L	10	11	15	12
+I	16	14	9	9	L	L	L	10	11	15	12
+I	16	14	10	10	10	10	10	10	11	15	12
+I	16	14	14	14	14	11	11	11	11	15	12
+13	16	16	16	16	14	I	I	I	I	15	12
+13	13	13	13	13	13	12	12	12	12	12	12
+
+[DEBUG] Peças conectadas ortogonalmente:
+Total de peças conectadas: 4 / 40
+
+Goal Test Results:
+- Todas regiões têm peça: False
+- Sem blocos 2x2: True
+- Peças conectadas: False
+- Sem peças iguais adjacentes: True
+
+[DEBUG] Estado atual do tabuleiro:
+1	1	I	I	I	I	2	3	L	X	4	4
+1	I	2	2	X	2	2	5	L	L	L	I
+1	I	S	S	7	7	I	5	5	5	3	I
+1	I	7	S	S	7	I	9	10	5	3	I
+1	I	L	X	X	7	I	9	10	5	5	I
+1	2	L	L	L	7	I	9	10	11	5	12
+I	14	14	8	8	8	X	L	10	11	15	12
+I	16	14	9	9	L	L	L	10	11	15	12
+I	16	14	10	10	10	10	10	10	11	15	12
+I	16	14	14	14	14	11	11	11	11	15	L
+13	16	16	16	16	14	I	I	I	I	X	L
+13	13	13	13	13	13	12	12	12	12	L	L
+
+[DEBUG] Peças conectadas ortogonalmente:
+Total de peças conectadas: 4 / 44
+
+Goal Test Results:
+- Todas regiões têm peça: False
+- Sem blocos 2x2: True
+- Peças conectadas: False
+- Sem peças iguais adjacentes: True
+
+[DEBUG] Estado atual do tabuleiro:
+1	1	I	I	I	I	2	3	L	X	4	4
+1	I	2	2	X	2	2	5	L	L	L	I
+1	I	S	S	7	7	I	5	5	5	3	I
+1	I	7	S	S	7	I	9	10	5	3	I
+1	I	L	X	X	7	I	9	10	5	5	I
+1	2	L	L	L	7	I	9	10	11	5	12
+I	14	14	8	8	8	X	L	10	11	15	12
+I	16	14	9	9	L	L	L	10	11	15	12
+I	16	14	10	10	10	10	10	10	11	15	12
+I	16	14	14	14	14	11	11	11	X	L	12
+13	16	16	16	16	14	15	15	L	L	L	12
+13	13	13	13	13	13	12	12	12	12	12	12
+
+[DEBUG] Peças conectadas ortogonalmente:
+Total de peças conectadas: 4 / 40
+
+Goal Test Results:
+- Todas regiões têm peça: False
+- Sem blocos 2x2: True
+- Peças conectadas: False
+- Sem peças iguais adjacentes: True
+
+[DEBUG] Estado atual do tabuleiro:
+1	1	I	I	I	I	2	3	L	X	4	4
+1	I	2	2	X	2	2	5	L	L	L	I
+1	I	S	S	7	7	I	5	5	5	3	I
+1	I	7	S	S	7	I	9	10	5	3	I
+1	I	L	X	X	7	I	9	10	5	5	I
+1	2	L	L	L	7	I	9	10	11	5	12
+I	14	14	8	8	8	X	L	10	11	15	12
+I	16	14	9	9	L	L	L	10	11	15	12
+I	16	14	10	10	10	10	10	10	11	L	12
+I	16	14	14	14	14	11	11	11	X	L	12
+13	16	16	16	16	14	15	15	15	L	L	12
+13	13	13	13	13	13	12	12	12	12	12	12
+
+[DEBUG] Peças conectadas ortogonalmente:
+Total de peças conectadas: 4 / 40
+
+Goal Test Results:
+- Todas regiões têm peça: False
+- Sem blocos 2x2: True
+- Peças conectadas: False
+- Sem peças iguais adjacentes: True
+
+[DEBUG] Estado atual do tabuleiro:
+1	1	1	1	1	1	2	3	L	X	4	I
+1	2	2	2	2	2	2	5	L	L	L	I
+1	2	6	6	7	7	8	5	5	5	3	I
+1	2	7	6	6	7	8	9	10	5	3	I
+1	2	7	6	7	7	8	9	10	5	5	4
+1	2	7	7	7	7	8	9	10	11	5	12
+13	14	14	8	8	8	8	9	10	11	15	12
+13	16	14	9	9	9	9	9	10	11	15	12
+13	16	14	10	10	10	10	10	10	11	15	12
+13	16	14	14	14	14	11	11	11	11	15	12
+13	16	16	16	16	14	15	15	15	15	15	12
+13	13	13	13	13	13	12	12	12	12	12	12
+
+[DEBUG] Peças conectadas ortogonalmente:
+  -> I conectado a L
+Total de peças conectadas: 8 / 8
 
 Goal Test Results:
 - Todas regiões têm peça: False
 - Sem blocos 2x2: True
 - Peças conectadas: True
 - Sem peças iguais adjacentes: True
-[DEBUG] Região 6 tem 1 ações possíveis (restrita, devolve já)
 
 [DEBUG] Estado atual do tabuleiro:
-I	I	I	I	L	L	I	I	I	I
-1	4	5	S	X	L	7	8	9	3
-4	4	5	S	S	L	7	8	9	9
-4	5	5	X	S	2	7	8	8	9
-4	5	11	10	6	2	7	12	8	9
-4	5	11	10	10	2	7	12	8	9
-4	5	11	11	10	7	7	12	8	13
-4	5	13	11	10	7	12	12	8	13
-4	5	13	11	10	12	12	13	8	13
-4	5	13	13	13	13	13	13	13	13
+1	1	1	1	1	1	2	3	L	X	4	I
+1	2	2	2	2	2	2	5	L	L	L	I
+1	2	6	6	7	7	I	5	5	5	3	I
+1	2	7	6	6	7	I	9	10	5	3	I
+1	2	7	6	7	7	I	9	10	5	5	4
+1	2	7	7	7	7	I	9	10	11	5	12
+13	14	14	8	8	8	8	9	10	11	15	12
+13	16	14	9	9	9	9	9	10	11	15	12
+13	16	14	10	10	10	10	10	10	11	15	12
+13	16	14	14	14	14	11	11	11	11	15	12
+13	16	16	16	16	14	15	15	15	15	15	12
+13	13	13	13	13	13	12	12	12	12	12	12
 
 [DEBUG] Peças conectadas ortogonalmente:
   -> I conectado a L
-  -> I conectado a S
-  -> L conectado a S
-Total de peças conectadas: 16 / 16
-
-Goal Test Results:
-- Todas regiões têm peça: False
-- Sem blocos 2x2: True
-- Peças conectadas: True
-- Sem peças iguais adjacentes: True
-[DEBUG] Região 10 tem 1 ações possíveis (restrita, devolve já)
-
-[DEBUG] Estado atual do tabuleiro:
-I	I	I	I	L	L	I	I	I	I
-1	4	5	S	X	L	7	8	9	3
-4	4	5	S	S	L	7	8	9	9
-4	5	5	X	S	2	7	8	8	9
-4	5	11	10	6	2	7	12	8	9
-4	5	11	10	I	2	7	12	8	9
-4	5	11	11	I	7	7	12	8	13
-4	5	13	11	I	7	12	12	8	13
-4	5	13	11	I	12	12	13	8	13
-4	5	13	13	13	13	13	13	13	13
-
-[DEBUG] Peças conectadas ortogonalmente:
-  -> I conectado a L
-  -> I conectado a S
-  -> L conectado a S
-Total de peças conectadas: 16 / 20
+Total de peças conectadas: 8 / 12
 
 Goal Test Results:
 - Todas regiões têm peça: False
 - Sem blocos 2x2: True
 - Peças conectadas: False
 - Sem peças iguais adjacentes: True
-[DEBUG] Região 5 tem 1 ações possíveis (restrita, devolve já)
 
 [DEBUG] Estado atual do tabuleiro:
-I	I	I	I	L	L	I	I	I	I
-1	4	5	S	X	L	7	8	9	3
-4	4	5	S	S	L	7	8	9	9
-4	5	5	X	S	2	7	8	8	9
-4	5	11	10	6	2	7	12	8	9
-4	5	11	10	I	2	7	12	8	9
-4	I	11	11	I	7	7	12	8	13
-4	I	13	11	I	7	12	12	8	13
-4	I	13	11	I	12	12	13	8	13
-4	I	13	13	13	13	13	13	13	13
+1	1	1	1	1	1	2	3	L	X	4	I
+1	2	2	2	X	2	2	5	L	L	L	I
+1	2	S	S	7	7	I	5	5	5	3	I
+1	2	7	S	S	7	I	9	10	5	3	I
+1	2	7	6	X	7	I	9	10	5	5	4
+1	2	7	7	7	7	I	9	10	11	5	12
+13	14	14	8	8	8	8	9	10	11	15	12
+13	16	14	9	9	9	9	9	10	11	15	12
+13	16	14	10	10	10	10	10	10	11	15	12
+13	16	14	14	14	14	11	11	11	11	15	12
+13	16	16	16	16	14	15	15	15	15	15	12
+13	13	13	13	13	13	12	12	12	12	12	12
 
 [DEBUG] Peças conectadas ortogonalmente:
   -> I conectado a L
-  -> I conectado a S
-  -> L conectado a S
-Total de peças conectadas: 16 / 24
+Total de peças conectadas: 8 / 16
 
 Goal Test Results:
 - Todas regiões têm peça: False
 - Sem blocos 2x2: True
 - Peças conectadas: False
 - Sem peças iguais adjacentes: True
-[DEBUG] Região 11 tem 1 ações possíveis (restrita, devolve já)
 
 [DEBUG] Estado atual do tabuleiro:
-I	I	I	I	L	L	I	I	I	I
-1	4	5	S	X	L	7	8	9	3
-4	4	5	S	S	L	7	8	9	9
-4	5	5	X	S	2	7	8	8	9
-4	5	L	10	6	2	7	12	8	9
-4	5	L	X	I	2	7	12	8	9
-4	I	L	L	I	7	7	12	8	13
-4	I	13	11	I	7	12	12	8	13
-4	I	13	11	I	12	12	13	8	13
-4	I	13	13	13	13	13	13	13	13
+1	1	1	1	1	1	2	3	L	X	4	I
+1	I	2	2	X	2	2	5	L	L	L	I
+1	I	S	S	7	7	I	5	5	5	3	I
+1	I	7	S	S	7	I	9	10	5	3	I
+1	I	7	6	X	7	I	9	10	5	5	4
+1	2	7	7	7	7	I	9	10	11	5	12
+13	14	14	8	8	8	8	9	10	11	15	12
+13	16	14	9	9	9	9	9	10	11	15	12
+13	16	14	10	10	10	10	10	10	11	15	12
+13	16	14	14	14	14	11	11	11	11	15	12
+13	16	16	16	16	14	15	15	15	15	15	12
+13	13	13	13	13	13	12	12	12	12	12	12
 
 [DEBUG] Peças conectadas ortogonalmente:
   -> I conectado a L
-  -> I conectado a S
-  -> L conectado a S
-Total de peças conectadas: 16 / 28
+Total de peças conectadas: 8 / 20
 
 Goal Test Results:
 - Todas regiões têm peça: False
 - Sem blocos 2x2: True
 - Peças conectadas: False
 - Sem peças iguais adjacentes: True
-[DEBUG] Focando na região 4 com 3 ações possíveis
 
 [DEBUG] Estado atual do tabuleiro:
-I	I	I	I	L	L	I	I	I	I
-X	S	5	S	X	L	7	8	9	3
-S	S	5	S	S	L	7	8	9	9
-S	X	5	X	S	2	7	8	8	9
-4	5	L	10	6	2	7	12	8	9
-4	5	L	X	I	2	7	12	8	9
-4	I	L	L	I	7	7	12	8	13
-4	I	13	11	I	7	12	12	8	13
-4	I	13	11	I	12	12	13	8	13
-4	I	13	13	13	13	13	13	13	13
+1	1	I	I	I	I	2	3	L	X	4	I
+1	I	2	2	X	2	2	5	L	L	L	I
+1	I	S	S	7	7	I	5	5	5	3	I
+1	I	7	S	S	7	I	9	10	5	3	I
+1	I	7	6	X	7	I	9	10	5	5	4
+1	2	7	7	7	7	I	9	10	11	5	12
+13	14	14	8	8	8	8	9	10	11	15	12
+13	16	14	9	9	9	9	9	10	11	15	12
+13	16	14	10	10	10	10	10	10	11	15	12
+13	16	14	14	14	14	11	11	11	11	15	12
+13	16	16	16	16	14	15	15	15	15	15	12
+13	13	13	13	13	13	12	12	12	12	12	12
 
 [DEBUG] Peças conectadas ortogonalmente:
-  -> I conectado a L
-  -> I conectado a S
-  -> L conectado a S
-Total de peças conectadas: 20 / 32
+Total de peças conectadas: 4 / 24
 
 Goal Test Results:
 - Todas regiões têm peça: False
 - Sem blocos 2x2: True
 - Peças conectadas: False
 - Sem peças iguais adjacentes: True
-[DEBUG] Focando na região 7 com 3 ações possíveis
 
 [DEBUG] Estado atual do tabuleiro:
-I	I	I	I	L	L	I	I	I	I
-X	S	5	S	X	L	7	8	9	3
-S	S	5	S	S	L	7	8	9	9
-S	X	5	X	S	2	I	8	8	9
-4	5	L	10	6	2	I	12	8	9
-4	5	L	X	I	2	I	12	8	9
-4	I	L	L	I	7	I	12	8	13
-4	I	13	11	I	7	12	12	8	13
-4	I	13	11	I	12	12	13	8	13
-4	I	13	13	13	13	13	13	13	13
+1	1	I	I	I	I	2	3	L	X	4	I
+1	I	2	2	X	2	2	5	L	L	L	I
+1	I	S	S	7	7	I	5	5	5	3	I
+1	I	7	S	S	7	I	9	10	5	3	I
+1	I	L	X	X	7	I	9	10	5	5	4
+1	2	L	L	L	7	I	9	10	11	5	12
+13	14	14	8	8	8	8	9	10	11	15	12
+13	16	14	9	9	9	9	9	10	11	15	12
+13	16	14	10	10	10	10	10	10	11	15	12
+13	16	14	14	14	14	11	11	11	11	15	12
+13	16	16	16	16	14	15	15	15	15	15	12
+13	13	13	13	13	13	12	12	12	12	12	12
 
 [DEBUG] Peças conectadas ortogonalmente:
-  -> I conectado a L
-  -> I conectado a S
-  -> L conectado a S
-Total de peças conectadas: 20 / 36
+Total de peças conectadas: 4 / 28
 
 Goal Test Results:
 - Todas regiões têm peça: False
 - Sem blocos 2x2: True
 - Peças conectadas: False
 - Sem peças iguais adjacentes: True
-[DEBUG] Região 12 tem 1 ações possíveis (restrita, devolve já)
 
 [DEBUG] Estado atual do tabuleiro:
-I	I	I	I	L	L	I	I	I	I
-X	S	5	S	X	L	7	8	9	3
-S	S	5	S	S	L	7	8	9	9
-S	X	5	X	S	2	I	8	8	9
-4	5	L	10	6	2	I	12	8	9
-4	5	L	X	I	2	I	12	8	9
-4	I	L	L	I	7	I	12	8	13
-4	I	13	11	I	X	S	S	8	13
-4	I	13	11	I	S	S	X	8	13
-4	I	13	13	13	13	13	13	13	13
+1	1	I	I	I	I	2	3	L	X	4	I
+1	I	2	2	X	2	2	5	L	L	L	I
+1	I	S	S	7	7	I	5	5	5	3	I
+1	I	7	S	S	7	I	9	10	5	3	I
+1	I	L	X	X	7	I	9	10	5	5	4
+1	2	L	L	L	7	I	9	10	11	5	12
+13	14	14	8	8	8	X	L	10	11	15	12
+13	16	14	9	9	L	L	L	10	11	15	12
+13	16	14	10	10	10	10	10	10	11	15	12
+13	16	14	14	14	14	11	11	11	11	15	12
+13	16	16	16	16	14	15	15	15	15	15	12
+13	13	13	13	13	13	12	12	12	12	12	12
 
 [DEBUG] Peças conectadas ortogonalmente:
-  -> I conectado a L
-  -> I conectado a S
-  -> L conectado a S
-Total de peças conectadas: 20 / 40
+Total de peças conectadas: 4 / 32
 
 Goal Test Results:
 - Todas regiões têm peça: False
 - Sem blocos 2x2: True
 - Peças conectadas: False
 - Sem peças iguais adjacentes: True
-[DEBUG] Região 8 tem 2 ações possíveis (restrita, devolve já)
 
 [DEBUG] Estado atual do tabuleiro:
-I	I	I	I	L	L	I	I	I	I
-X	S	5	S	X	L	7	8	9	3
-S	S	5	S	S	L	7	8	9	9
-S	X	5	X	S	2	I	8	8	9
-4	5	L	10	6	2	I	12	I	9
-4	5	L	X	I	2	I	12	I	9
-4	I	L	L	I	7	I	12	I	13
-4	I	13	11	I	X	S	S	I	13
-4	I	13	11	I	S	S	X	8	13
-4	I	13	13	13	13	13	13	13	13
+1	1	I	I	I	I	2	3	L	X	4	I
+1	I	2	2	X	2	2	5	L	L	L	I
+1	I	S	S	7	7	I	5	5	5	3	I
+1	I	7	S	S	7	I	9	10	5	3	I
+1	I	L	X	X	7	I	9	10	5	5	4
+1	2	L	L	L	7	I	9	10	11	5	12
+13	14	14	8	8	8	X	L	10	11	15	12
+13	16	14	9	9	L	L	L	10	11	15	12
+13	16	14	10	10	10	10	10	10	11	15	12
+13	16	14	14	14	14	11	11	11	11	15	12
+13	16	16	16	16	14	15	15	15	15	15	12
+13	13	I	I	I	I	12	12	12	12	12	12
 
 [DEBUG] Peças conectadas ortogonalmente:
-  -> I conectado a L
-  -> I conectado a S
-  -> L conectado a S
-Total de peças conectadas: 20 / 44
+Total de peças conectadas: 4 / 36
 
 Goal Test Results:
 - Todas regiões têm peça: False
 - Sem blocos 2x2: True
 - Peças conectadas: False
 - Sem peças iguais adjacentes: True
-[DEBUG] Região 9 tem 2 ações possíveis (restrita, devolve já)
 
 [DEBUG] Estado atual do tabuleiro:
-I	I	I	I	L	L	I	I	I	I
-X	S	5	S	X	L	7	8	S	X
-S	S	5	S	S	L	7	8	S	S
-S	X	5	X	S	2	I	8	X	S
-4	5	L	10	6	2	I	12	I	9
-4	5	L	X	I	2	I	12	I	9
-4	I	L	L	I	7	I	12	I	13
-4	I	13	11	I	X	S	S	I	13
-4	I	13	11	I	S	S	X	8	13
-4	I	13	13	13	13	13	13	13	13
+1	1	I	I	I	I	2	3	L	X	4	I
+1	I	2	2	X	2	2	5	L	L	L	I
+1	I	S	S	7	7	I	5	5	5	3	I
+1	I	7	S	S	7	I	9	10	5	3	I
+1	I	L	X	X	7	I	9	10	5	5	4
+1	2	L	L	L	7	I	9	10	11	5	12
+13	14	14	8	8	8	X	L	10	11	15	12
+13	16	14	9	9	L	L	L	10	11	15	12
+13	16	14	10	10	10	10	10	10	11	15	12
+13	16	14	L	L	L	11	11	11	11	15	12
+13	16	16	16	X	L	15	15	15	15	15	12
+13	13	I	I	I	I	12	12	12	12	12	12
 
 [DEBUG] Peças conectadas ortogonalmente:
-  -> I conectado a L
-  -> I conectado a S
-  -> L conectado a S
-Total de peças conectadas: 24 / 48
+Total de peças conectadas: 4 / 40
 
 Goal Test Results:
 - Todas regiões têm peça: False
 - Sem blocos 2x2: True
 - Peças conectadas: False
 - Sem peças iguais adjacentes: True
-[DEBUG] Focando na região 13 com 3 ações possíveis
 
 [DEBUG] Estado atual do tabuleiro:
-I	I	I	I	L	L	I	I	I	I
-X	S	5	S	X	L	7	8	S	X
-S	S	5	S	S	L	7	8	S	S
-S	X	5	X	S	2	I	8	X	S
-4	5	L	10	6	2	I	12	I	9
-4	5	L	X	I	2	I	12	I	9
-4	I	L	L	I	7	I	12	I	13
-4	I	13	11	I	X	S	S	I	13
-4	I	13	11	I	S	S	X	8	13
-4	I	13	13	13	13	I	I	I	I
+1	1	I	I	I	I	2	3	L	X	4	I
+1	I	2	2	X	2	2	5	L	L	L	I
+1	I	S	S	7	7	I	5	5	5	3	I
+1	I	7	S	S	7	I	9	10	5	3	I
+1	I	L	X	X	7	I	9	10	5	5	4
+1	2	L	L	L	7	I	9	10	11	5	12
+13	14	14	8	8	8	X	L	10	11	15	12
+13	16	14	9	9	L	L	L	10	11	15	12
+13	16	14	10	10	10	10	10	10	11	15	12
+13	16	14	L	L	L	11	11	11	11	15	12
+13	16	16	16	X	L	I	I	I	I	15	12
+13	13	I	I	I	I	12	12	12	12	12	12
 
 [DEBUG] Peças conectadas ortogonalmente:
-  -> I conectado a L
-  -> I conectado a S
-  -> L conectado a S
-Total de peças conectadas: 24 / 52
-
-Goal Test Results:
-- Todas regiões têm peça: True
-- Sem blocos 2x2: True
-- Peças conectadas: False
-- Sem peças iguais adjacentes: True
-
-[DEBUG] Estado atual do tabuleiro:
-I	I	I	I	L	L	I	I	I	I
-X	S	5	S	X	L	7	8	S	X
-S	S	5	S	S	L	7	8	S	S
-S	X	5	X	S	2	I	8	X	S
-4	5	L	10	6	2	I	12	I	9
-4	5	L	X	I	2	I	12	I	9
-4	I	L	L	I	7	I	12	I	13
-4	I	13	11	I	X	S	S	I	13
-4	I	13	11	I	S	S	X	X	L
-4	I	13	13	13	13	13	L	L	L
-
-[DEBUG] Peças conectadas ortogonalmente:
-  -> I conectado a L
-  -> I conectado a S
-  -> L conectado a S
-Total de peças conectadas: 24 / 52
-
-Goal Test Results:
-- Todas regiões têm peça: True
-- Sem blocos 2x2: True
-- Peças conectadas: False
-- Sem peças iguais adjacentes: True
-
-[DEBUG] Estado atual do tabuleiro:
-I	I	I	I	L	L	I	I	I	I
-X	S	5	S	X	L	7	8	S	X
-S	S	5	S	S	L	7	8	S	S
-S	X	5	X	S	2	I	8	X	S
-4	5	L	10	6	2	I	12	I	9
-4	5	L	X	I	2	I	12	I	9
-4	I	L	L	I	7	I	12	I	13
-4	I	13	11	I	X	S	S	I	L
-4	I	13	11	I	S	S	X	X	L
-4	I	13	13	13	13	13	13	L	L
-
-[DEBUG] Peças conectadas ortogonalmente:
-  -> I conectado a L
-  -> I conectado a S
-  -> L conectado a S
-Total de peças conectadas: 24 / 52
-
-Goal Test Results:
-- Todas regiões têm peça: True
-- Sem blocos 2x2: True
-- Peças conectadas: False
-- Sem peças iguais adjacentes: True
-
-[DEBUG] Estado atual do tabuleiro:
-I	I	I	I	L	L	I	I	I	I
-X	S	5	S	X	L	7	8	9	3
-S	S	5	S	S	L	7	8	L	L
-S	X	5	X	S	2	I	8	X	L
-4	5	L	10	6	2	I	12	I	L
-4	5	L	X	I	2	I	12	I	9
-4	I	L	L	I	7	I	12	I	13
-4	I	13	11	I	X	S	S	I	13
-4	I	13	11	I	S	S	X	8	13
-4	I	13	13	13	13	13	13	13	13
-
-[DEBUG] Peças conectadas ortogonalmente:
-  -> I conectado a L
-  -> I conectado a S
-  -> L conectado a S
-Total de peças conectadas: 20 / 48
+Total de peças conectadas: 4 / 44
 
 Goal Test Results:
 - Todas regiões têm peça: False
 - Sem blocos 2x2: True
 - Peças conectadas: False
 - Sem peças iguais adjacentes: True
-[DEBUG] Focando na região 13 com 3 ações possíveis
 
 [DEBUG] Estado atual do tabuleiro:
-I	I	I	I	L	L	I	I	I	I
-X	S	5	S	X	L	7	8	9	3
-S	S	5	S	S	L	7	8	L	L
-S	X	5	X	S	2	I	8	X	L
-4	5	L	10	6	2	I	12	I	L
-4	5	L	X	I	2	I	12	I	9
-4	I	L	L	I	7	I	12	I	13
-4	I	13	11	I	X	S	S	I	13
-4	I	13	11	I	S	S	X	8	13
-4	I	13	13	13	13	I	I	I	I
+1	1	I	I	I	I	2	3	L	X	4	I
+1	I	2	2	X	2	2	5	L	L	L	I
+1	I	S	S	7	7	I	5	5	5	3	I
+1	I	7	S	S	7	I	9	10	5	3	I
+1	I	L	X	X	7	I	9	10	5	5	4
+1	2	L	L	L	7	I	9	10	11	5	12
+13	14	14	8	8	8	X	L	10	11	15	12
+13	16	14	9	9	L	L	L	10	11	15	12
+13	16	14	10	10	10	10	10	10	11	15	12
+13	16	14	L	L	L	11	11	11	11	15	L
+13	16	16	16	X	L	I	I	I	I	X	L
+13	13	I	I	I	I	12	12	12	12	L	L
 
 [DEBUG] Peças conectadas ortogonalmente:
-  -> I conectado a L
-  -> I conectado a S
-  -> L conectado a S
-Total de peças conectadas: 20 / 52
-
-Goal Test Results:
-- Todas regiões têm peça: True
-- Sem blocos 2x2: True
-- Peças conectadas: False
-- Sem peças iguais adjacentes: True
-
-[DEBUG] Estado atual do tabuleiro:
-I	I	I	I	L	L	I	I	I	I
-X	S	5	S	X	L	7	8	9	3
-S	S	5	S	S	L	7	8	L	L
-S	X	5	X	S	2	I	8	X	L
-4	5	L	10	6	2	I	12	I	L
-4	5	L	X	I	2	I	12	I	9
-4	I	L	L	I	7	I	12	I	13
-4	I	13	11	I	X	S	S	I	13
-4	I	13	11	I	S	S	X	X	L
-4	I	13	13	13	13	13	L	L	L
-
-[DEBUG] Peças conectadas ortogonalmente:
-  -> I conectado a L
-  -> I conectado a S
-  -> L conectado a S
-Total de peças conectadas: 20 / 52
-
-Goal Test Results:
-- Todas regiões têm peça: True
-- Sem blocos 2x2: True
-- Peças conectadas: False
-- Sem peças iguais adjacentes: True
-
-[DEBUG] Estado atual do tabuleiro:
-I	I	I	I	L	L	I	I	I	I
-X	S	5	S	X	L	7	8	9	3
-S	S	5	S	S	L	7	8	L	L
-S	X	5	X	S	2	I	8	X	L
-4	5	L	10	6	2	I	12	I	L
-4	5	L	X	I	2	I	12	I	9
-4	I	L	L	I	7	I	12	I	13
-4	I	13	11	I	X	S	S	I	L
-4	I	13	11	I	S	S	X	X	L
-4	I	13	13	13	13	13	13	L	L
-
-[DEBUG] Peças conectadas ortogonalmente:
-  -> I conectado a L
-  -> I conectado a S
-  -> L conectado a S
-Total de peças conectadas: 20 / 52
-
-Goal Test Results:
-- Todas regiões têm peça: True
-- Sem blocos 2x2: True
-- Peças conectadas: False
-- Sem peças iguais adjacentes: True
-
-[DEBUG] Estado atual do tabuleiro:
-I	I	I	I	L	L	I	I	I	I
-X	S	5	S	X	L	7	L	9	3
-S	S	5	S	S	L	7	L	X	9
-S	X	5	X	S	2	I	L	L	9
-4	5	L	10	6	2	I	12	8	9
-4	5	L	X	I	2	I	12	8	9
-4	I	L	L	I	7	I	12	8	13
-4	I	13	11	I	X	S	S	8	13
-4	I	13	11	I	S	S	X	8	13
-4	I	13	13	13	13	13	13	13	13
-
-[DEBUG] Peças conectadas ortogonalmente:
-  -> I conectado a L
-  -> I conectado a S
-  -> L conectado a S
-Total de peças conectadas: 44 / 44
+Total de peças conectadas: 4 / 48
 
 Goal Test Results:
 - Todas regiões têm peça: False
 - Sem blocos 2x2: True
-- Peças conectadas: True
+- Peças conectadas: False
 - Sem peças iguais adjacentes: True
-[DEBUG] Região 9 tem 1 ações possíveis (restrita, devolve já)
 
 [DEBUG] Estado atual do tabuleiro:
-I	I	I	I	L	L	I	I	I	I
-X	S	5	S	X	L	7	L	9	3
-S	S	5	S	S	L	7	L	X	I
-S	X	5	X	S	2	I	L	L	I
-4	5	L	10	6	2	I	12	8	I
-4	5	L	X	I	2	I	12	8	I
-4	I	L	L	I	7	I	12	8	13
-4	I	13	11	I	X	S	S	8	13
-4	I	13	11	I	S	S	X	8	13
-4	I	13	13	13	13	13	13	13	13
+1	1	I	I	I	I	2	3	L	X	4	I
+1	I	2	2	X	2	2	5	L	L	L	I
+1	I	S	S	7	7	I	5	5	5	3	I
+1	I	7	S	S	7	I	9	10	5	3	I
+1	I	L	X	X	7	I	9	10	5	5	4
+1	2	L	L	L	7	I	9	10	11	5	12
+13	14	14	8	8	8	X	L	10	11	15	12
+13	16	14	9	9	L	L	L	10	11	15	12
+13	L	14	10	10	10	10	10	10	11	15	12
+13	L	X	L	L	L	11	11	11	11	15	L
+13	L	L	16	X	L	I	I	I	I	X	L
+13	13	I	I	I	I	12	12	12	12	L	L
 
 [DEBUG] Peças conectadas ortogonalmente:
-  -> I conectado a L
-  -> I conectado a S
-  -> L conectado a S
-Total de peças conectadas: 48 / 48
+Total de peças conectadas: 4 / 52
 
 Goal Test Results:
 - Todas regiões têm peça: False
 - Sem blocos 2x2: True
-- Peças conectadas: True
+- Peças conectadas: False
 - Sem peças iguais adjacentes: True
-[DEBUG] Focando na região 13 com 3 ações possíveis
 
 [DEBUG] Estado atual do tabuleiro:
-I	I	I	I	L	L	I	I	I	I
-X	S	5	S	X	L	7	L	9	3
-S	S	5	S	S	L	7	L	X	I
-S	X	5	X	S	2	I	L	L	I
-4	5	L	10	6	2	I	12	8	I
-4	5	L	X	I	2	I	12	8	I
-4	I	L	L	I	7	I	12	8	13
-4	I	13	11	I	X	S	S	8	13
-4	I	13	11	I	S	S	X	8	13
-4	I	13	13	13	13	I	I	I	I
+1	1	I	I	I	I	2	3	L	X	4	I
+1	I	2	2	X	2	2	5	L	L	L	I
+1	I	S	S	7	7	I	5	5	5	3	I
+1	I	7	S	S	7	I	9	10	5	3	I
+1	I	L	X	X	7	I	9	10	5	5	4
+1	2	L	L	L	7	I	9	10	11	5	12
+I	14	14	8	8	8	X	L	10	11	15	12
+I	16	14	9	9	L	L	L	10	11	15	12
+I	16	14	10	10	10	10	10	10	11	15	12
+I	16	14	14	14	14	11	11	11	11	15	12
+13	16	16	16	16	14	15	15	15	15	15	12
+13	13	13	13	13	13	12	12	12	12	12	12
 
 [DEBUG] Peças conectadas ortogonalmente:
-  -> I conectado a L
-  -> I conectado a S
-  -> L conectado a S
-Total de peças conectadas: 52 / 52
+Total de peças conectadas: 4 / 36
 
 Goal Test Results:
-- Todas regiões têm peça: True
+- Todas regiões têm peça: False
 - Sem blocos 2x2: True
-- Peças conectadas: True
+- Peças conectadas: False
+- Sem peças iguais adjacentes: True
+
+[DEBUG] Estado atual do tabuleiro:
+1	1	I	I	I	I	2	3	L	X	4	I
+1	I	2	2	X	2	2	5	L	L	L	I
+1	I	S	S	7	7	I	5	5	5	3	I
+1	I	7	S	S	7	I	9	10	5	3	I
+1	I	L	X	X	7	I	9	10	5	5	4
+1	2	L	L	L	7	I	9	10	11	5	12
+I	14	14	8	8	8	X	L	10	11	15	12
+I	16	14	9	9	L	L	L	10	11	15	12
+I	16	14	10	10	10	10	10	10	11	15	12
+I	16	14	14	14	14	11	11	11	11	15	12
+13	16	16	16	16	14	15	I	I	I	I	12
+13	13	13	13	13	13	12	12	12	12	12	12
+
+[DEBUG] Peças conectadas ortogonalmente:
+Total de peças conectadas: 4 / 40
+
+Goal Test Results:
+- Todas regiões têm peça: False
+- Sem blocos 2x2: True
+- Peças conectadas: False
+- Sem peças iguais adjacentes: True
+
+[DEBUG] Estado atual do tabuleiro:
+1	1	I	I	I	I	2	3	L	X	4	I
+1	I	2	2	X	2	2	5	L	L	L	I
+1	I	S	S	7	7	I	5	5	5	3	I
+1	I	7	S	S	7	I	9	10	5	3	I
+1	I	L	X	X	7	I	9	10	5	5	4
+1	2	L	L	L	7	I	9	10	11	5	12
+I	14	14	8	8	8	X	L	10	11	15	12
+I	16	14	9	9	L	L	L	10	11	15	12
+I	16	14	10	10	10	10	10	10	11	15	12
+I	16	14	14	14	14	11	11	11	11	15	12
+13	16	16	16	16	14	I	I	I	I	15	12
+13	13	13	13	13	13	12	12	12	12	12	12
+
+[DEBUG] Peças conectadas ortogonalmente:
+Total de peças conectadas: 4 / 40
+
+Goal Test Results:
+- Todas regiões têm peça: False
+- Sem blocos 2x2: True
+- Peças conectadas: False
+- Sem peças iguais adjacentes: True
+
+[DEBUG] Estado atual do tabuleiro:
+1	1	I	I	I	I	2	3	L	X	4	I
+1	I	2	2	X	2	2	5	L	L	L	I
+1	I	S	S	7	7	I	5	5	5	3	I
+1	I	7	S	S	7	I	9	10	5	3	I
+1	I	L	X	X	7	I	9	10	5	5	4
+1	2	L	L	L	7	I	9	10	11	5	12
+I	14	14	8	8	8	X	L	10	11	15	12
+I	16	14	9	9	L	L	L	10	11	15	12
+I	16	14	10	10	10	10	10	10	11	15	12
+I	16	14	14	14	14	11	11	11	11	15	L
+13	16	16	16	16	14	I	I	I	I	X	L
+13	13	13	13	13	13	12	12	12	12	L	L
+
+[DEBUG] Peças conectadas ortogonalmente:
+Total de peças conectadas: 4 / 44
+
+Goal Test Results:
+- Todas regiões têm peça: False
+- Sem blocos 2x2: True
+- Peças conectadas: False
+- Sem peças iguais adjacentes: True
+
+[DEBUG] Estado atual do tabuleiro:
+1	1	I	I	I	I	2	3	L	X	4	I
+1	I	2	2	X	2	2	5	L	L	L	I
+1	I	S	S	7	7	I	5	5	5	3	I
+1	I	7	S	S	7	I	9	10	5	3	I
+1	I	L	X	X	7	I	9	10	5	5	4
+1	2	L	L	L	7	I	9	10	11	5	12
+I	14	14	8	8	8	X	L	10	11	15	12
+I	16	14	9	9	L	L	L	10	11	15	12
+I	16	14	10	10	10	10	10	10	11	15	12
+I	16	14	14	14	14	11	11	11	X	L	12
+13	16	16	16	16	14	15	15	L	L	L	12
+13	13	13	13	13	13	12	12	12	12	12	12
+
+[DEBUG] Peças conectadas ortogonalmente:
+Total de peças conectadas: 4 / 40
+
+Goal Test Results:
+- Todas regiões têm peça: False
+- Sem blocos 2x2: True
+- Peças conectadas: False
+- Sem peças iguais adjacentes: True
+
+[DEBUG] Estado atual do tabuleiro:
+1	1	I	I	I	I	2	3	L	X	4	I
+1	I	2	2	X	2	2	5	L	L	L	I
+1	I	S	S	7	7	I	5	5	5	3	I
+1	I	7	S	S	7	I	9	10	5	3	I
+1	I	L	X	X	7	I	9	10	5	5	4
+1	2	L	L	L	7	I	9	10	11	5	12
+I	14	14	8	8	8	X	L	10	11	15	12
+I	16	14	9	9	L	L	L	10	11	15	12
+I	16	14	10	10	10	10	10	10	11	L	12
+I	16	14	14	14	14	11	11	11	X	L	12
+13	16	16	16	16	14	15	15	15	L	L	12
+13	13	13	13	13	13	12	12	12	12	12	12
+
+[DEBUG] Peças conectadas ortogonalmente:
+Total de peças conectadas: 4 / 40
+
+Goal Test Results:
+- Todas regiões têm peça: False
+- Sem blocos 2x2: True
+- Peças conectadas: False
 - Sem peças iguais adjacentes: True
 A testar com DFS...
-  Programa executado em 0.3573 segundos
-  Memória usada: 102 kB
-  Nós gerados: 30
-  Nós expandidos: 22
-
-Solução encontrada:
-I	I	I	I	L	L	I	I	I	I
-X	S	5	S	X	L	7	L	9	3
-S	S	5	S	S	L	7	L	X	I
-S	X	5	X	S	2	I	L	L	I
-4	5	L	10	6	2	I	12	8	I
-4	5	L	X	I	2	I	12	8	I
-4	I	L	L	I	7	I	12	8	13
-4	I	13	11	I	X	S	S	8	13
-4	I	13	11	I	S	S	X	8	13
-4	I	13	13	13	13	I	I	I	I
+  Programa executado em 2.5742 segundos
+  Memória usada: 220 kB
+  Nós gerados: 64
+  Nós expandidos: 65
+Nenhuma solução encontrada.

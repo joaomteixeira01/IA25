@@ -284,7 +284,7 @@ class Nuruomino(Problem):
 
         return actions
     
-    def actions(self, state: NuruominoState):
+    def actions1(self, state: NuruominoState):
         board = state.board
         best_region = None
         best_actions = None
@@ -297,6 +297,7 @@ class Nuruomino(Problem):
                 continue
 
             actions_for_region = []
+
             for piece_letter, shapes in TETRAMINOS.items():
                 for index, shape in enumerate(shapes):
                     for origin in region_cells:
@@ -351,70 +352,79 @@ class Nuruomino(Problem):
         return []
 
 
-    def actions1(self, state: NuruominoState):
-        """Retorna uma lista de ações que podem ser executadas a
-        partir do estado passado como argumento."""
+    def actions(self, state: NuruominoState):
         board = state.board
-        
-        # Dicionário para rastrear quantidade de ações potenciais e as ações válidas por região
-        region_actions_count = {}
-        valid_actions_by_region = {}
-        
-        # Iteração única para contar e armazenar ações válidas por região
+        best_region = None
+        best_actions = []
+        min_actions = float('inf')
+
         for region_id in self.regions:
             region_cells = board.get_region_positions(region_id)
-            
-            # Verifica se a região já tem algumas letras colocadas
-            has_letters = any(
-                board.get_value(i, j) in "LITS"
-                for (i, j) in region_cells
-            )
-            
-            # Pula se a região já tem algumas letras mas não exatamente 4
-            piece_positions = [
-                (i, j) for (i, j) in region_cells 
-                if board.get_value(i, j) in "LITS"
-            ]
-            
-            if has_letters and len(piece_positions) != 4:
-                # Pula regiões com peças parciais
+            letras = [board.get_value(i, j) for (i, j) in region_cells if board.get_value(i, j) in "LITS"]
+
+            if len(letras) == 4 or (letras and len(letras) != 4):
                 continue
-                
-            # Armazena as ações válidas enquanto conta
+
             actions_for_region = []
-            
+
+            # Só gerar ações a partir de células "ativas" (com adjacente preenchido)
+            candidate_origins = [cell for cell in region_cells if any(
+                board.get_value(ni, nj) in "LITS" for (ni, nj) in board.adjacent_positions(cell[0], cell[1])
+            )]
+            if not candidate_origins:
+                candidate_origins = region_cells  # fallback
+
             for piece_letter, shapes in TETRAMINOS.items():
                 for index, shape in enumerate(shapes):
-                    for origin in region_cells:
+                    for origin in candidate_origins:
                         shape_abs = [(origin[0] + dx, origin[1] + dy) for dx, dy in shape]
-                        
-                        # Verifica se a peça cabe nesta região nesta origem
-                        if all(
-                            pos in region_cells and
-                            board.get_value(pos[0], pos[1]) not in "LITSX"  
-                            for pos in shape_abs
-                        ):
-                            if not self._would_touch_equal_piece(shape_abs, piece_letter, board) and not self._would_create_2x2_block(shape_abs, board):
-                                # Armazena a ação válida
-                                actions_for_region.append((region_id, piece_letter, shape, index, shape_abs))
+                        if not all(pos in region_cells and board.get_value(pos[0], pos[1]) not in "LITSX" for pos in shape_abs):
+                            continue
+                        if self._would_touch_equal_piece(shape_abs, piece_letter, board):
+                            continue
+                        if self._would_create_2x2_block(shape_abs, board):
+                            continue
 
-            
-            # Se encontrou ações válidas para esta região
-            if actions_for_region:
-                region_actions_count[region_id] = len(actions_for_region)
-                valid_actions_by_region[region_id] = actions_for_region
-        
-        # Nenhuma ação válida para qualquer região
-        if not region_actions_count:
-            return []
-        
-        # Encontra a região com o menor número de ações (mais restrita)
-        most_constrained_region = min(region_actions_count.items(), key=lambda x: x[1])[0]
-        
-        print(f"[DEBUG] Focando na região {most_constrained_region} com {region_actions_count[most_constrained_region]} ações possíveis")
-        
-        # Retorna diretamente as ações já calculadas para a região mais restrita
-        return valid_actions_by_region[most_constrained_region]
+                        # --- Forward checking só para regiões vizinhas ---
+                        next_state = self.result(state, (region_id, piece_letter, shape, index, shape_abs))
+                        blocked = False
+                        for neighbor_region in board.adjacent_regions(region_id):
+                            neighbor_cells = board.get_region_positions(neighbor_region)
+                            neighbor_piece_positions = [(i, j) for (i, j) in neighbor_cells if next_state.board.get_value(i, j) in "LITS"]
+                            if len(neighbor_piece_positions) == 4 or (neighbor_piece_positions and len(neighbor_piece_positions) != 4):
+                                continue
+                            found = False
+                            for n_piece_letter, n_shapes in TETRAMINOS.items():
+                                for n_index, n_shape in enumerate(n_shapes):
+                                    for n_origin in neighbor_cells:
+                                        n_shape_abs = [(n_origin[0] + dx, n_origin[1] + dy) for dx, dy in n_shape]
+                                        if all(
+                                            pos in neighbor_cells and
+                                            next_state.board.get_value(pos[0], pos[1]) not in "LITSX"
+                                            for pos in n_shape_abs
+                                        ):
+                                            if not self._would_touch_equal_piece(n_shape_abs, n_piece_letter, next_state.board) and not self._would_create_2x2_block(n_shape_abs, next_state.board):
+                                                found = True
+                                                break
+                                    if found:
+                                        break
+                                if found:
+                                    break
+                            if not found:
+                                blocked = True
+                                break
+                        if not blocked:
+                            actions_for_region.append((region_id, piece_letter, shape, index, shape_abs))
+
+            if 0 < len(actions_for_region) <= 2:
+                return actions_for_region
+
+            if 0 < len(actions_for_region) < min_actions:
+                min_actions = len(actions_for_region)
+                best_region = region_id
+                best_actions = actions_for_region
+
+        return best_actions
 
 
     def result(self, state: NuruominoState, action):
