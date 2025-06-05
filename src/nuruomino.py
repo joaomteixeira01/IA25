@@ -109,9 +109,9 @@ class Board:
         return self.board[row][col]
     
     def print_instance(self):
-        """Imprime a grelha no formato esperado (com tabs)"""
-        for row in self.board:
-            print('\t'.join(map(str, row)))
+        """Imprime a grelha no formato esperado (com tabs), sem \n final"""
+        output = '\n'.join('\t'.join(map(str, row)) for row in self.board)
+        print(output, end='')
 
     def adjacent_regions(self, region:int) -> list:
         """Devolve uma lista das regiões que fazem fronteira com a região enviada no argumento."""
@@ -223,68 +223,68 @@ class Nuruomino(Problem):
         return False
 
 
-    def actions2(self, state: NuruominoState):
-        """Retorna uma lista de ações que podem ser executadas a
-        partir do estado passado como argumento."""
-        actions = []
-        board = state.board
+    # def actions2(self, state: NuruominoState):
+    #     """Retorna uma lista de ações que podem ser executadas a
+    #     partir do estado passado como argumento."""
+    #     actions = []
+    #     board = state.board
 
-        regions_sorted = sorted(self.regions, key=lambda r: len(board.get_region_positions(r)) != 4)
+    #     regions_sorted = sorted(self.regions, key=lambda r: len(board.get_region_positions(r)) != 4)
 
-        for region_id in regions_sorted:
-            region_cells = board.get_region_positions(region_id)
+    #     for region_id in regions_sorted:
+    #         region_cells = board.get_region_positions(region_id)
 
-            # Check if region already has some LITS letters placed
-            has_letters = any(
-                board.get_value(i, j) in "LITS"
-                for (i, j) in region_cells
-            )
+    #         # Check if region already has some LITS letters placed
+    #         has_letters = any(
+    #             board.get_value(i, j) in "LITS"
+    #             for (i, j) in region_cells
+    #         )
 
-            # If region already has some letters but not exactly 4, skip it
-            # This prevents adding multiple tetrominoes to a single region
-            piece_positions = [
-                (i, j) for (i, j) in region_cells 
-                if board.get_value(i, j) in "LITS"
-            ]
+    #         # If region already has some letters but not exactly 4, skip it
+    #         # This prevents adding multiple tetrominoes to a single region
+    #         piece_positions = [
+    #             (i, j) for (i, j) in region_cells 
+    #             if board.get_value(i, j) in "LITS"
+    #         ]
             
-            # Skip if region already has some letters but not a complete tetromino
-            if has_letters and len(piece_positions) != 4:
-                continue
+    #         # Skip if region already has some letters but not a complete tetromino
+    #         if has_letters and len(piece_positions) != 4:
+    #             continue
 
-            for piece_letter, shapes in TETRAMINOS.items():
-                for index, shape in enumerate(shapes):
-                    for origin in region_cells:
-                        shape_abs = [(origin[0] + dx, origin[1] + dy) for dx, dy in shape]
+    #         for piece_letter, shapes in TETRAMINOS.items():
+    #             for index, shape in enumerate(shapes):
+    #                 for origin in region_cells:
+    #                     shape_abs = [(origin[0] + dx, origin[1] + dy) for dx, dy in shape]
 
-                        # DEBUG: Mostra cada tentativa de encaixe
-                        print(f"Tentando regiao {region_id} com peça {piece_letter} (forma {index}) na origem {origin}: {shape_abs}")
+    #                     # DEBUG: Mostra cada tentativa de encaixe
+    #                     print(f"Tentando regiao {region_id} com peça {piece_letter} (forma {index}) na origem {origin}: {shape_abs}")
 
-                        # Verifica se a peça encaixa na própria região e em células ainda disponíveis
-                        if all(
-                            pos in region_cells and
-                            board.get_value(pos[0], pos[1]) not in "LITSX"  # pode ser número ou '?'
-                            for pos in shape_abs
-                        ):
-                            '''if self._would_create_2x2_block(shape_abs, board):
-                                continue'''
-                            if self._would_touch_equal_piece(shape_abs, piece_letter, board):
-                                continue
-                            actions.append((region_id, piece_letter, shape, index, shape_abs))
-                        # else:
-                        #     # Para debug
-                        #     falhas = []
-                        #     for pos in shape_abs:
-                        #         if pos not in region_cells:
-                        #             falhas.append(f"Posicao {pos} nao esta na regiao {region_id}")
-                        #         elif board.get_value(pos[0], pos[1]) in "LITSX":
-                        #             falhas.append(f"Posicao {pos} ja tem valor {board.get_value(pos[0], pos[1])}")
+    #                     # Verifica se a peça encaixa na própria região e em células ainda disponíveis
+    #                     if all(
+    #                         pos in region_cells and
+    #                         board.get_value(pos[0], pos[1]) not in "LITSX"  # pode ser número ou '?'
+    #                         for pos in shape_abs
+    #                     ):
+    #                         '''if self._would_create_2x2_block(shape_abs, board):
+    #                             continue'''
+    #                         if self._would_touch_equal_piece(shape_abs, piece_letter, board):
+    #                             continue
+    #                         actions.append((region_id, piece_letter, shape, index, shape_abs))
+    #                     # else:
+    #                     #     # Para debug
+    #                     #     falhas = []
+    #                     #     for pos in shape_abs:
+    #                     #         if pos not in region_cells:
+    #                     #             falhas.append(f"Posicao {pos} nao esta na regiao {region_id}")
+    #                     #         elif board.get_value(pos[0], pos[1]) in "LITSX":
+    #                     #             falhas.append(f"Posicao {pos} ja tem valor {board.get_value(pos[0], pos[1])}")
                             
-                        #     if falhas:
-                        #         print(f"Rejeicao: {', '.join(falhas)}")
+    #                     #     if falhas:
+    #                     #         print(f"Rejeicao: {', '.join(falhas)}")
 
-        return actions
+    #     return actions
     
-    def actions1(self, state: NuruominoState):
+    def actions(self, state: NuruominoState):
         board = state.board
         best_region = None
         best_actions = None
@@ -339,7 +339,7 @@ class Nuruomino(Problem):
                                 if not blocked:
                                     actions_for_region.append((region_id, piece_letter, shape, index, shape_abs))
             if 0 < len(actions_for_region) <= 2:
-                print(f"[DEBUG] Região {region_id} tem {len(actions_for_region)} ações possíveis (restrita, devolve já)")
+                #print(f"[DEBUG] Região {region_id} tem {len(actions_for_region)} ações possíveis (restrita, devolve já)")
                 return actions_for_region
             if 0 < len(actions_for_region) < min_actions:
                 min_actions = len(actions_for_region)
@@ -347,84 +347,84 @@ class Nuruomino(Problem):
                 best_actions = actions_for_region
 
         if best_actions:
-            print(f"[DEBUG] Focando na região {best_region} com {min_actions} ações possíveis")
+            #print(f"[DEBUG] Focando na região {best_region} com {min_actions} ações possíveis")
             return best_actions
         return []
 
 
-    def actions(self, state: NuruominoState):
-        board = state.board
-        best_region = None
-        best_actions = []
-        min_actions = float('inf')
+    # def actions(self, state: NuruominoState):
+    #     board = state.board
+    #     best_region = None
+    #     best_actions = []
+    #     min_actions = float('inf')
 
-        for region_id in self.regions:
-            region_cells = board.get_region_positions(region_id)
-            letras = [board.get_value(i, j) for (i, j) in region_cells if board.get_value(i, j) in "LITS"]
+    #     for region_id in self.regions:
+    #         region_cells = board.get_region_positions(region_id)
+    #         letras = [board.get_value(i, j) for (i, j) in region_cells if board.get_value(i, j) in "LITS"]
 
-            if len(letras) == 4 or (letras and len(letras) != 4):
-                continue
+    #         if len(letras) == 4 or (letras and len(letras) != 4):
+    #             continue
 
-            actions_for_region = []
+    #         actions_for_region = []
 
-            # Só gerar ações a partir de células "ativas" (com adjacente preenchido)
-            candidate_origins = [cell for cell in region_cells if any(
-                board.get_value(ni, nj) in "LITS" for (ni, nj) in board.adjacent_positions(cell[0], cell[1])
-            )]
-            if not candidate_origins:
-                candidate_origins = region_cells  # fallback
+    #         # Só gerar ações a partir de células "ativas" (com adjacente preenchido)
+    #         candidate_origins = [cell for cell in region_cells if any(
+    #             board.get_value(ni, nj) in "LITS" for (ni, nj) in board.adjacent_positions(cell[0], cell[1])
+    #         )]
+    #         if not candidate_origins:
+    #             candidate_origins = region_cells  # fallback
 
-            for piece_letter, shapes in TETRAMINOS.items():
-                for index, shape in enumerate(shapes):
-                    for origin in candidate_origins:
-                        shape_abs = [(origin[0] + dx, origin[1] + dy) for dx, dy in shape]
-                        if not all(pos in region_cells and board.get_value(pos[0], pos[1]) not in "LITSX" for pos in shape_abs):
-                            continue
-                        if self._would_touch_equal_piece(shape_abs, piece_letter, board):
-                            continue
-                        if self._would_create_2x2_block(shape_abs, board):
-                            continue
+    #         for piece_letter, shapes in TETRAMINOS.items():
+    #             for index, shape in enumerate(shapes):
+    #                 for origin in candidate_origins:
+    #                     shape_abs = [(origin[0] + dx, origin[1] + dy) for dx, dy in shape]
+    #                     if not all(pos in region_cells and board.get_value(pos[0], pos[1]) not in "LITSX" for pos in shape_abs):
+    #                         continue
+    #                     if self._would_touch_equal_piece(shape_abs, piece_letter, board):
+    #                         continue
+    #                     if self._would_create_2x2_block(shape_abs, board):
+    #                         continue
 
-                        # --- Forward checking só para regiões vizinhas ---
-                        next_state = self.result(state, (region_id, piece_letter, shape, index, shape_abs))
-                        blocked = False
-                        for neighbor_region in board.adjacent_regions(region_id):
-                            neighbor_cells = board.get_region_positions(neighbor_region)
-                            neighbor_piece_positions = [(i, j) for (i, j) in neighbor_cells if next_state.board.get_value(i, j) in "LITS"]
-                            if len(neighbor_piece_positions) == 4 or (neighbor_piece_positions and len(neighbor_piece_positions) != 4):
-                                continue
-                            found = False
-                            for n_piece_letter, n_shapes in TETRAMINOS.items():
-                                for n_index, n_shape in enumerate(n_shapes):
-                                    for n_origin in neighbor_cells:
-                                        n_shape_abs = [(n_origin[0] + dx, n_origin[1] + dy) for dx, dy in n_shape]
-                                        if all(
-                                            pos in neighbor_cells and
-                                            next_state.board.get_value(pos[0], pos[1]) not in "LITSX"
-                                            for pos in n_shape_abs
-                                        ):
-                                            if not self._would_touch_equal_piece(n_shape_abs, n_piece_letter, next_state.board) and not self._would_create_2x2_block(n_shape_abs, next_state.board):
-                                                found = True
-                                                break
-                                    if found:
-                                        break
-                                if found:
-                                    break
-                            if not found:
-                                blocked = True
-                                break
-                        if not blocked:
-                            actions_for_region.append((region_id, piece_letter, shape, index, shape_abs))
+    #                     # --- Forward checking só para regiões vizinhas ---
+    #                     next_state = self.result(state, (region_id, piece_letter, shape, index, shape_abs))
+    #                     blocked = False
+    #                     for neighbor_region in board.adjacent_regions(region_id):
+    #                         neighbor_cells = board.get_region_positions(neighbor_region)
+    #                         neighbor_piece_positions = [(i, j) for (i, j) in neighbor_cells if next_state.board.get_value(i, j) in "LITS"]
+    #                         if len(neighbor_piece_positions) == 4 or (neighbor_piece_positions and len(neighbor_piece_positions) != 4):
+    #                             continue
+    #                         found = False
+    #                         for n_piece_letter, n_shapes in TETRAMINOS.items():
+    #                             for n_index, n_shape in enumerate(n_shapes):
+    #                                 for n_origin in neighbor_cells:
+    #                                     n_shape_abs = [(n_origin[0] + dx, n_origin[1] + dy) for dx, dy in n_shape]
+    #                                     if all(
+    #                                         pos in neighbor_cells and
+    #                                         next_state.board.get_value(pos[0], pos[1]) not in "LITSX"
+    #                                         for pos in n_shape_abs
+    #                                     ):
+    #                                         if not self._would_touch_equal_piece(n_shape_abs, n_piece_letter, next_state.board) and not self._would_create_2x2_block(n_shape_abs, next_state.board):
+    #                                             found = True
+    #                                             break
+    #                                 if found:
+    #                                     break
+    #                             if found:
+    #                                 break
+    #                         if not found:
+    #                             blocked = True
+    #                             break
+    #                     if not blocked:
+    #                         actions_for_region.append((region_id, piece_letter, shape, index, shape_abs))
 
-            if 0 < len(actions_for_region) <= 2:
-                return actions_for_region
+    #         if 0 < len(actions_for_region) <= 2:
+    #             return actions_for_region
 
-            if 0 < len(actions_for_region) < min_actions:
-                min_actions = len(actions_for_region)
-                best_region = region_id
-                best_actions = actions_for_region
+    #         if 0 < len(actions_for_region) < min_actions:
+    #             min_actions = len(actions_for_region)
+    #             best_region = region_id
+    #             best_actions = actions_for_region
 
-        return best_actions
+    #     return best_actions
 
 
     def result(self, state: NuruominoState, action):
@@ -566,11 +566,11 @@ class Nuruomino(Problem):
             if board.get_value(i, j) in "LITS"
         )
 
-        if debug:
-            print(f"\n[DEBUG] Peças conectadas ortogonalmente:")
-            for a, b in sorted(piece_connections):
-                print(f"  -> {a} conectado a {b}")
-            print(f"Total de peças conectadas: {len(visited)} / {total_filled}")
+        # if debug:
+        #     print(f"\n[DEBUG] Peças conectadas ortogonalmente:")
+        #     for a, b in sorted(piece_connections):
+        #         print(f"  -> {a} conectado a {b}")
+        #     print(f"Total de peças conectadas: {len(visited)} / {total_filled}")
 
         return len(visited) == total_filled
         
@@ -630,19 +630,19 @@ class Nuruomino(Problem):
         
     def goal_test(self, state: NuruominoState):
         board = state.board
-        print("\n[DEBUG] Estado atual do tabuleiro:")
-        board.print_instance()
+        #print("\n[DEBUG] Estado atual do tabuleiro:")
+        #board.print_instance()
         
         all_pieces = self._all_regions_have_one_piece(board)
         no_2x2 = self._has_no_2x2_blocks(board) 
         connected = self._is_connected(board, debug=True)  # Ative o debug
         no_adj = self._no_same_piece_adjacent(board)
         
-        print(f"\nGoal Test Results:")
-        print(f"- Todas regiões têm peça: {all_pieces}")
-        print(f"- Sem blocos 2x2: {no_2x2}")
-        print(f"- Peças conectadas: {connected}")
-        print(f"- Sem peças iguais adjacentes: {no_adj}")
+        # print(f"\nGoal Test Results:")
+        # print(f"- Todas regiões têm peça: {all_pieces}")
+        # print(f"- Sem blocos 2x2: {no_2x2}")
+        # print(f"- Peças conectadas: {connected}")
+        # print(f"- Sem peças iguais adjacentes: {no_adj}")
         
         return all([all_pieces, no_2x2, connected, no_adj])
 
@@ -793,8 +793,8 @@ def limpar_X(board: Board):
 if __name__ == "__main__":
     board = Board.parse_instance()
 
-    print("Grelha lida do input:")
-    board.print_instance()
+    # print("Grelha lida do input:")
+    # board.print_instance()
 
     tracemalloc.start()
     tic = time.perf_counter()
@@ -806,10 +806,10 @@ if __name__ == "__main__":
     problem = Nuruomino(board)
     #state = NuruominoState(board)
 
-    print("\nNúmero de células por região:")
-    for region_id in problem.regions:
-        positions = board.get_region_positions(region_id)
-        print(f" - Região {region_id}: {len(positions)} células")
+    # print("\nNúmero de células por região:")
+    # for region_id in problem.regions:
+    #     positions = board.get_region_positions(region_id)
+    #     print(f" - Região {region_id}: {len(positions)} células")
 
     # Aplicamos peças nas regiões com 4 células
     # board = preenche_regioes_de_4_celulas(board, problem)
@@ -842,10 +842,10 @@ if __name__ == "__main__":
     problem = Nuruomino(board)  # novo problem com board atualizado
     problem.initial = state
 
-    print("\nAções válidas no estado atual:")
-    for action in problem.actions(state):
-        region_id, piece, shape, index, shape_abs = action
-        print(f"Região {region_id} -> peça {piece} com forma {shape} na posição {shape_abs}")
+    # print("\nAções válidas no estado atual:")
+    # for action in problem.actions(state):
+    #     region_id, piece, shape, index, shape_abs = action
+    #     print(f"Região {region_id} -> peça {piece} com forma {shape} na posição {shape_abs}")
 
 
     # print("\nTabuleiro apos limpar celulas 'X':")
@@ -860,7 +860,7 @@ if __name__ == "__main__":
     # print("A testar com BFS...")
 
     goal_node = depth_first_graph_search(instrumented)
-    print("A testar com DFS...")
+    # print("A testar com DFS...")
     
     toc = time.perf_counter()
     print(f"  Programa executado em {toc - tic:0.4f} segundos")
@@ -868,10 +868,11 @@ if __name__ == "__main__":
     print(f"  Nós gerados: {instrumented.states}")
     print(f"  Nós expandidos: {instrumented.succs}")
     if goal_node:
-        print("\nSolução encontrada:")
+        #print("\nSolução encontrada:")
+        limpar_X(goal_node.state.board)
         goal_node.state.board.print_instance()
-    else:
-        print("Nenhuma solução encontrada.")
+    # else:
+    #     print("Nenhuma solução encontrada.")
 
 
     '''print("\nÚltimos 10 estados gerados:")
@@ -968,4 +969,3 @@ if __name__ == "__main__":
 
     
     debug_goal_test_details(problem)'''
-
