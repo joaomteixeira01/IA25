@@ -118,6 +118,7 @@ class Board:
         self.board = board
         self.n = len(board)
         self._region_positions_cache = {}  # Cache para posições de regiões
+        self._adjacent_regions_cache = {}  # Cache para regiões adjacentes
         # Só faz cópia se necessário
         if preserve_original:
             self.regiao_original = [row[:] for row in board]  # shallow copy das linhas
@@ -157,17 +158,19 @@ class Board:
 
     def adjacent_regions(self, region:int) -> list:
         """Devolve uma lista das regiões que fazem fronteira com a região enviada no argumento."""
-        adjacents = set()
-        for i in range(len(self.board)):
-            for j in range(len(self.board[0])):
-                if self.board[i][j] == str(region):  # célula da região procurada
-                    for (di, dj) in [(-1, 0), (1, 0), (0, -1), (0, 1)]:  # cima, baixo, esquerda, direita
-                        ni, nj = i + di, j + dj
-                        if 0 <= ni < len(self.board) and 0 <= nj < len(self.board[0]):
-                            val = self.board[ni][nj]
-                            if val != str(region) and val.isdigit():  # só adiciona se for número
-                                adjacents.add(int(val))  # converter para inteiro
-        return list(adjacents)
+        if region not in self._adjacent_regions_cache:
+            adjacents = set()
+            for i in range(len(self.board)):
+                for j in range(len(self.board[0])):
+                    if self.board[i][j] == str(region):  # célula da região procurada
+                        for (di, dj) in [(-1, 0), (1, 0), (0, -1), (0, 1)]:  # cima, baixo, esquerda, direita
+                            ni, nj = i + di, j + dj
+                            if 0 <= ni < len(self.board) and 0 <= nj < len(self.board[0]):
+                                val = self.board[ni][nj]
+                                if val != str(region) and val.isdigit():  # só adiciona se for número
+                                    adjacents.add(int(val))  # converter para inteiro
+            self._adjacent_regions_cache[region] = list(adjacents)
+        return self._adjacent_regions_cache[region]
     
     def adjacent_positions(self, row:int, col:int) -> list:
         """Devolve as posições adjacentes à região, em todas as direções, incluindo diagonais."""
@@ -376,6 +379,12 @@ class Nuruomino(Problem):
         for i, j in shape_abs:
             new_board_data[i][j] = piece_letter
 
+        new_board = copy.copy(state.board)  # Shallow copy
+        new_board.board = new_board_data
+        new_board.regiao_original = state.board.regiao_original  # Reutiliza a referência
+
+        # Marcar células modificadas
+        new_board._last_changed_cells = set(shape_abs)
         if piece_letter in CORNER_OFFSETS:
             corner_offsets = CORNER_OFFSETS[piece_letter][index]
             origin_i = shape_abs[0][0] - shape[0][0]
@@ -384,12 +393,9 @@ class Nuruomino(Problem):
                 ci = origin_i + offset_i
                 cj = origin_j + offset_j
                 if 0 <= ci < len(new_board_data) and 0 <= cj < len(new_board_data[0]):
+                    new_board._last_changed_cells.add((ci, cj))
                     if new_board_data[ci][cj].isdigit():
                         new_board_data[ci][cj] = 'X'
-
-        new_board = copy.copy(state.board)  # Shallow copy
-        new_board.board = new_board_data
-        new_board.regiao_original = state.board.regiao_original  # Reutiliza a referência
 
          # Copia a lista de ações do estado anterior
         new_board.region_actions_list = {}
@@ -524,22 +530,27 @@ class Nuruomino(Problem):
     
         return True
 
+
     def _has_no_2x2_blocks(self, board):
-        '''
-            Verifica se existem blocos 2x2 formados por celulas com peças, ou seja, com letras pertencentes a LITS
-        '''
-        for i in range(board.n - 1):
-            for j in range(board.n - 1):
-                values = [
-                    board.get_value(i, j),
-                    board.get_value(i+1, j),
-                    board.get_value(i, j+1),
-                    board.get_value(i+1, j+1)
-                ]
-                if all(v in "LITS" for v in values):
-                    #print(f"[DEBUG] Bloco 2x2 inválido encontrado em ({i},{j}) com letras: {values}")
-                    return False
-        return True
+        # Focar apenas em células modificadas recentemente
+        changed_cells = getattr(board, '_last_changed_cells', None)
+        if changed_cells:
+            for (i,j) in changed_cells:
+                # Verificar apenas quadrantes ao redor desta célula
+                for di, dj in [(0,0), (-1,0), (0,-1), (-1,-1)]:
+                    if 0 <= i+di < board.n-1 and 0 <= j+dj < board.n-1:
+                        # Verificação do bloco 2x2
+                        if all(board.get_value(i+di+x, j+dj+y) in "LITS" 
+                            for x in [0,1] for y in [0,1]):
+                            return False
+            return True
+        else:
+            # Verificação completa (backup)
+            for i in range(board.n - 1):
+                for j in range(board.n - 1):
+                    if all(board.get_value(i+x, j+y) in "LITS" for x in [0,1] for y in [0,1]):
+                        return False
+            return True
 
 
     def _is_connected(self, board, debug=False):
@@ -625,18 +636,21 @@ class Nuruomino(Problem):
         print("\n[DEBUG] Estado atual do tabuleiro:")
         board.print_instance()
         
-        all_pieces = self._all_regions_have_one_piece(board, state)
-        no_2x2 = self._has_no_2x2_blocks(board) 
-        connected = self._is_connected(board, debug=True)  # Ative o debug
-        no_adj = self._no_same_piece_adjacent(board)
+        if not self._all_regions_have_one_piece(state.board, state):
+            print(f"- Todas regiões têm peça: {False}")
+            return False
+        if not self._no_same_piece_adjacent(state.board):
+            print(f"- Peças iguais adjacentes: {False}")
+            return False 
+        if not self._has_no_2x2_blocks(state.board):
+            print(f"- Sem blocos 2x2: {False}")
+            return False
+        if not self._is_connected(state.board, debug=True):
+            print(f"- Peças conectadas: {False}")
+            return False
+        return True
         
-        print(f"\nGoal Test Results:")
-        print(f"- Todas regiões têm peça: {all_pieces}")
-        print(f"- Sem blocos 2x2: {no_2x2}")
-        print(f"- Peças conectadas: {connected}")
-        print(f"- Sem peças iguais adjacentes: {no_adj}")
         
-        return all([all_pieces, no_2x2, connected, no_adj])
 
     '''def h(self, node: Node):
         """Função heuristica utilizada para a procura A*."""
