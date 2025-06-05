@@ -114,12 +114,15 @@ class NuruominoState:
 class Board:
     """Representação interna de um tabuleiro do Puzzle Nuruomino."""
 
-    def __init__(self, board):
+    def __init__(self, board, preserve_original=True):
         self.board = board
         self.n = len(board)
-        self.regiao_original = copy.deepcopy(board)  # guarda a grelha original para referência
-        self.regions = self._extract_regions()  # Adicionar esta linha
-    
+        # Só faz cópia se necessário
+        if preserve_original:
+            self.regiao_original = [row[:] for row in board]  # shallow copy das linhas
+        else:
+            self.regiao_original = board
+        self.regions = self._extract_regions()  
     def _extract_regions(self):
         """Identifica os números das regiões únicas no tabuleiro."""
         unique_regions = set()
@@ -296,9 +299,9 @@ class Nuruomino(Problem):
                         continue
                 valid_actions.append(action)
 
-
         return valid_actions            
     
+
     def _has_future_solutions(self, state, filled_region):
         """Verifica rapidamente se regiões adjacentes ainda têm soluções viáveis"""
         adjacent_regions = state.board.adjacent_regions(filled_region)
@@ -338,8 +341,8 @@ class Nuruomino(Problem):
                     if new_board_data[ci][cj].isdigit():
                         new_board_data[ci][cj] = 'X'
 
-        new_board = Board(new_board_data)
-        new_board.regiao_original = state.board.regiao_original
+        new_board = Board(new_board_data, preserve_original=False)
+        new_board.regiao_original = state.board.regiao_original  # Reutiliza a referência
 
         
         LAST_STATES.append(new_board)
@@ -355,12 +358,12 @@ class Nuruomino(Problem):
         region_id, piece_letter, shape, index, shape_abs = action
         board = state.board
     
-        # Verifica se não está a criar um bloco 2x2
-        if self._would_create_2x2_block(shape_abs, board):
-            return False
-        
-        # Verifica se não está a tocar numa peça igual
+        # Verificação mais rápida primeiro
         if self._would_touch_equal_piece(shape_abs, piece_letter, board):
+            return False
+            
+        # Verificação mais pesada por último
+        if self._would_create_2x2_block(shape_abs, board):
             return False
     
     
@@ -709,10 +712,6 @@ if __name__ == "__main__":
     tracemalloc.start()
     tic = time.perf_counter()
 
-    # Guardar um copia original
-    original_board_copy = copy.deepcopy(board.board)
-    board.regiao_original = original_board_copy
-
     problem = Nuruomino(board)
     #state = NuruominoState(board)
 
@@ -779,6 +778,7 @@ if __name__ == "__main__":
     print(f"  Nós expandidos: {instrumented.succs}")
     if goal_node:
         print("\nSolução encontrada:")
+        limpar_X(goal_node.state.board)  # Limpa os 'X' antes de imprimir
         goal_node.state.board.print_instance()
     else:
         print("Nenhuma solução encontrada.")

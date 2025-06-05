@@ -99,10 +99,13 @@ class NuruominoState:
 class Board:
     """Representação interna de um tabuleiro do Puzzle Nuruomino."""
 
-    def __init__(self, board):
+    def __init__(self, board, preserve_original=True):
         self.board = board
         self.n = len(board)
-        self.regiao_original = copy.deepcopy(board)  # guarda a grelha original para referência
+        if preserve_original:
+            self.regiao_original = [row[:] for row in board]  # shallow copy das linhas
+        else:
+            self.regiao_original = board
 
     def get_value(self, row, col):
         """Devolve o valor da célula na posição (row, col)"""
@@ -453,8 +456,9 @@ class Nuruomino(Problem):
                     if new_board_data[ci][cj].isdigit():
                         new_board_data[ci][cj] = 'X'
 
-        new_board = Board(new_board_data)
-        new_board.regiao_original = state.board.regiao_original
+        new_board = Board(new_board_data, preserve_original=False)
+        new_board.regiao_original = state.board.regiao_original  # Reutiliza a referência
+
         LAST_STATES.append(new_board)
         if len(LAST_STATES) > 10:
             LAST_STATES.pop(0)
@@ -799,9 +803,6 @@ if __name__ == "__main__":
     tracemalloc.start()
     tic = time.perf_counter()
 
-    # Guardar um copia original
-    original_board_copy = copy.deepcopy(board.board)
-    board.regiao_original = original_board_copy
 
     problem = Nuruomino(board)
     #state = NuruominoState(board)
@@ -863,12 +864,12 @@ if __name__ == "__main__":
     # print("A testar com DFS...")
     
     toc = time.perf_counter()
-    print(f"  Programa executado em {toc - tic:0.4f} segundos")
-    print(f"  Memória usada: {tracemalloc.get_traced_memory()[1] // 1024} kB")
-    print(f"  Nós gerados: {instrumented.states}")
-    print(f"  Nós expandidos: {instrumented.succs}")
+    # print(f"  Programa executado em {toc - tic:0.4f} segundos")
+    # print(f"  Memória usada: {tracemalloc.get_traced_memory()[1] // 1024} kB")
+    # print(f"  Nós gerados: {instrumented.states}")
+    # print(f"  Nós expandidos: {instrumented.succs}")
     if goal_node:
-        #print("\nSolução encontrada:")
+        #
         limpar_X(goal_node.state.board)
         goal_node.state.board.print_instance()
     # else:
