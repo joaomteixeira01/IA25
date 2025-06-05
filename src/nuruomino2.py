@@ -383,21 +383,7 @@ class Nuruomino(Problem):
         new_board.board = new_board_data
         new_board.regiao_original = state.board.regiao_original  # Reutiliza a referência
 
-        # Marcar células modificadas
-        new_board._last_changed_cells = set(shape_abs)
-        if piece_letter in CORNER_OFFSETS:
-            corner_offsets = CORNER_OFFSETS[piece_letter][index]
-            origin_i = shape_abs[0][0] - shape[0][0]
-            origin_j = shape_abs[0][1] - shape[0][1]
-            for offset_i, offset_j in corner_offsets:
-                ci = origin_i + offset_i
-                cj = origin_j + offset_j
-                if 0 <= ci < len(new_board_data) and 0 <= cj < len(new_board_data[0]):
-                    new_board._last_changed_cells.add((ci, cj))
-                    if new_board_data[ci][cj].isdigit():
-                        new_board_data[ci][cj] = 'X'
-
-         # Copia a lista de ações do estado anterior
+        # Copia a lista de ações do estado anterior
         new_board.region_actions_list = {}
         for reg_id, actions in state.board.region_actions_list.items():
             new_board.region_actions_list[reg_id] = actions[:]  # shallow copy da lista
