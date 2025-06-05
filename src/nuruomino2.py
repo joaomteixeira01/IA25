@@ -515,45 +515,12 @@ class Nuruomino(Problem):
                                 return True
         return False
 
-
-    # Game rules 
-    def _all_regions_have_one_piece(self, board):
-        """Verifica se cada região tem exatamente uma peça tetraminó (4 células com letra), ignorando 'X'."""
-        from collections import deque
-    
-        def orthogonal_neighbors(i, j):
-            return [(i-1,j), (i+1,j), (i,j-1), (i,j+1)]
-    
-        for region_id in self.regions:
-            region_cells = board.get_region_positions(region_id)
-    
-            # Filtrar apenas as posições com letras LITS
-            piece_positions = [
-                (i, j)
-                for (i, j) in region_cells
-                if board.get_value(i, j) in "LITS"
-            ]
-    
-            if len(piece_positions) == 0:
-                return False  # região sem peça
-    
-            if len(piece_positions) != 4:
-                return False
-    
-            # Verificar se estão conectadas entre si ortogonalmente
-            visited = set()
-            queue = deque([piece_positions[0]])
-            visited.add(piece_positions[0])
-    
-            while queue:
-                i, j = queue.popleft()
-                for ni, nj in orthogonal_neighbors(i, j):
-                    if (ni, nj) in piece_positions and (ni, nj) not in visited:
-                        visited.add((ni, nj))
-                        queue.append((ni, nj))
-    
-            if len(visited) != 4:
-                return False
+   # Game rules 
+    def _all_regions_have_one_piece(self, board, state):
+        """Verifica se cada região tem exatamente uma peça tetraminó (4 células com letra)."""
+        # Se ainda há regiões por preencher, automaticamente não todas têm peças
+        if state.unfinished_regions:
+            return False
     
         return True
 
@@ -658,7 +625,7 @@ class Nuruomino(Problem):
         print("\n[DEBUG] Estado atual do tabuleiro:")
         board.print_instance()
         
-        all_pieces = self._all_regions_have_one_piece(board)
+        all_pieces = self._all_regions_have_one_piece(board, state)
         no_2x2 = self._has_no_2x2_blocks(board) 
         connected = self._is_connected(board, debug=True)  # Ative o debug
         no_adj = self._no_same_piece_adjacent(board)
