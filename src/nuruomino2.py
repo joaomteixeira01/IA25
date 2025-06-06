@@ -147,14 +147,17 @@ class Board:
                     unique_regions.add(int(cell))
         return sorted(unique_regions)
 
+
     def get_value(self, row, col):
         """Devolve o valor da célula na posição (row, col)"""
         return self.board[row][col]
     
+
     def print_instance(self):
         """Imprime a grelha no formato esperado (com tabs), sem \n final"""
         output = '\n'.join('\t'.join(map(str, row)) for row in self.board)
         print(output, end='')
+
 
     def adjacent_regions(self, region:int) -> list:
         """Devolve uma lista das regiões que fazem fronteira com a região enviada no argumento."""
@@ -265,64 +268,6 @@ class Nuruomino(Problem):
         self.regions = board.regions 
         initial_state = NuruominoState(board)
         super().__init__(initial_state)
-        
-        # # lista de ações por região
-        # self.region_actions_list = {}
-        # for region_id in self.regions:
-        #     self.region_actions_list[region_id] = self.region_actions(region_id)
-        
-        # # Ordenar regiões por número de ações (menos ações primeiro)
-        # region_action_counts = [(region_id, len(actions)) 
-        #                        for region_id, actions in self.region_actions_list.items()]
-        # region_action_counts.sort(key=lambda x: x[1])
-        # self.regions = [region_id for region_id, _ in region_action_counts]
-
-
-    # def region_actions(self, region_id):
-    #     """Calcula todas as ações possíveis para uma região (versão do region_actions original)"""
-    #     actions = []
-    #     piece_letters = list(TETRAMINOS.keys())
-    #     region_positions = self.board.get_region_positions(region_id)
-        
-    #     for piece_letter in piece_letters:
-    #         for index, shape in enumerate(TETRAMINOS[piece_letter]):
-    #             for anchor_pos in region_positions:
-    #                 anchor_i, anchor_j = anchor_pos
-                    
-    #                 shape_abs = []
-    #                 valid_placement = True
-                    
-    #                 for rel_i, rel_j in shape:
-    #                     abs_i = anchor_i + rel_i
-    #                     abs_j = anchor_j + rel_j
-                        
-    #                     if 0 <= abs_i < self.board.n and 0 <= abs_j < self.board.n:
-    #                         shape_abs.append((abs_i, abs_j))
-    #                     else:
-    #                         valid_placement = False
-    #                         break
-                    
-    #                 if valid_placement and all(pos in region_positions for pos in shape_abs):
-    #                     actions.append((region_id, piece_letter, shape, index, shape_abs))
-        
-    #     return actions
-    
-    # def update_adjacent_actions(self, state: NuruominoState, filled_region: int):
-    #     """Atualiza self.region_actions_list removendo ações inválidas nas regiões adjacentes."""
-    #     adjacent_regions = state.board.adjacent_regions(filled_region)
-        
-    #     for region in adjacent_regions:
-    #         if region in self.region_actions_list:
-    #             # Filtra apenas as ações que continuam válidas
-    #             valid_actions = [
-    #                 action for action in self.region_actions_list[region]
-    #                 if self.is_valid_action(action, state)
-    #             ]
-    #             self.region_actions_list[region] = valid_actions
-
-    #     # Reordena as regiões com base no número de ações restantes (menos ações primeiro)
-    #     self.regions.sort(key=lambda r: len(self.region_actions_list[r]))
-    
     
     def actions(self, state: NuruominoState):  
         """Devolve uma lista de ações possíveis para o estado atual."""
@@ -392,14 +337,14 @@ class Nuruomino(Problem):
         if region_id in new_board.region_actions_list:
             del new_board.region_actions_list[region_id]
 
-            # Atualiza as ações das regiões adjacentes removendo as inválidas
+        # Atualiza as ações das regiões adjacentes removendo as inválidas
         self._update_adjacent_actions(new_board, region_id, piece_letter, shape_abs)
         
         # Reordena as regiões por número de ações (menos ações primeiro)
         remaining_regions = [r for r in new_board.regions if r in new_board.region_actions_list]
         remaining_regions.sort(key=lambda r: len(new_board.region_actions_list[r]))
         new_board.regions = remaining_regions
-        print(f"[DEBUG] regions_actions_list: {new_board.region_actions_list}")
+        #print(f"[DEBUG] regions_actions_list: {new_board.region_actions_list}")
         
         LAST_STATES.append(new_board)
         if len(LAST_STATES) > 10:
@@ -407,26 +352,41 @@ class Nuruomino(Problem):
 
         new_state = NuruominoState(new_board)
         return new_state
-    
+
+
 
     def _update_adjacent_actions(self, board, filled_region, piece_letter, placed_positions):
-        """Atualiza board.region_actions_list removendo ações inválidas nas regiões adjacentes."""
         adjacent_regions = board.adjacent_regions(filled_region)
-        
+
+        # Conjunto de posições afetadas (para ver sobreposição com ações existentes)
+        placed_set = set(placed_positions)
+
         for adj_region in adjacent_regions:
             if adj_region not in board.region_actions_list:
                 continue
-                
-            # Filtra ações que ainda são válidas
-            valid_actions = []
-            for action in board.region_actions_list[adj_region]:
-                action_region_id, action_piece, action_shape, action_index, action_positions = action
-                
-                # Verifica se a ação ainda é válida considerando a nova peça colocada
-                if self._is_action_still_valid(action, piece_letter, placed_positions, board):
-                    valid_actions.append(action)
-            
-            board.region_actions_list[adj_region] = valid_actions
+
+            old_actions = board.region_actions_list[adj_region]
+            new_actions = []
+
+            for action in old_actions:
+                _, act_piece, _, _, act_positions = action
+
+                # Se esta ação toca em alguma célula da peça colocada:
+                if any(pos in placed_set for pos in act_positions):
+                    # Verifica se ainda é válida
+                    if self._is_action_still_valid(action, piece_letter, placed_positions, board):
+                        new_actions.append(action)
+                    # Senão, ignora (ação inválida)
+                else:
+                    # Ação não foi afetada, mantém
+                    new_actions.append(action)
+
+            board.region_actions_list[adj_region] = new_actions
+
+        # # Remove filled_region das listas de adjacências de outras regiões
+        # for region_id in list(board._adjacent_regions_cache.keys()):
+        #     if filled_region in board._adjacent_regions_cache[region_id]:
+        #         board._adjacent_regions_cache[region_id].remove(filled_region)
     
 
     def _is_action_still_valid(self, action, new_piece_letter, new_positions, board):
@@ -455,6 +415,9 @@ class Nuruomino(Problem):
                             return False
         
         return True
+
+
+    
 
     def is_valid_action(self, action, state: NuruominoState):
         """Verifica se a ação é válida no estado atual."""
@@ -621,6 +584,9 @@ class Nuruomino(Problem):
         board = state.board
         print("\n[DEBUG] Estado atual do tabuleiro:")
         board.print_instance()
+
+        if state.unfinished_regions:  # Se ainda há regiões por preencher
+            return False
         
         if not self._all_regions_have_one_piece(state.board, state):
             print(f"- Todas regiões têm peça: {False}")
@@ -860,6 +826,7 @@ def main():
         goal_node.state.board.print_instance()
     else:
         print("Nenhuma solução encontrada.")
+
 
 
 if __name__ == "__main__":
