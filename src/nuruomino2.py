@@ -100,6 +100,7 @@ class Board:
         self.finished_regions = set()               # Regiões já preenchidas
         self.invalid = False                        # Flag de estado inválido
         self.regiao_original = [row[:] for row in board_matrix]  # Cópia do tabuleiro original
+        self._shape_cache = {}  # Cache for expensive calculations
 
         # Identifica e agrupa células por região
         for i in range(self.rows):
@@ -129,35 +130,30 @@ class Board:
         return Board(board_matrix)
 
     def duplicate_board(self):
-        """Cria uma cópia otimizada do tabuleiro sem chamar __init__."""
-        # Cria nova instância sem chamar o construtor
+        """Cria uma cópia otimizada do tabuleiro."""
         new_board = Board.__new__(Board)
         
-        # Copia a matriz do tabuleiro (shallow copy)
+        # Copy matrix more efficiently
         new_board.board = [row[:] for row in self.board]
-        
-        # Copia atributos primitivos
         new_board.rows = self.rows
         new_board.cols = self.cols
         new_board.invalid = self.invalid
+        new_board.regiao_original = self.regiao_original  # Immutable reference
+        new_board._shape_cache = {}  # Initialize cache for new board
         
-        # Referencia o original imutável (nunca modificado após criação)
-        new_board.regiao_original = self.regiao_original
-        
-        # Cópia otimizada das regiões
+        # Optimize regions copy - avoid deep copying unchanged data
         new_board.regions = {}
         for region_id, info in self.regions.items():
             new_board.regions[region_id] = {
-                'cells': info['cells'],          # Tuplos são imutáveis
-                'adjacents': set(info['adjacents']),  # Precisa de novo conjunto
-                'domain': info['domain'][:],    # Shallow copy é suficiente
-                'action': info['action']        # Imutável (None ou Action)
+                'cells': info['cells'],  # Immutable list of tuples
+                'adjacents': info['adjacents'].copy(),  # Only this changes
+                'domain': info['domain'],  # Share reference until modified
+                'action': info['action']  # Immutable
             }
         
-        # Copia regiões terminadas
-        new_board.finished_regions = set(self.finished_regions)
-        
+        new_board.finished_regions = self.finished_regions.copy()
         return new_board
+    
 
     def find_adjacent_regions(self, id_regiao):
         """Encontra todas as regiões adjacentes a uma região específica."""
@@ -197,15 +193,22 @@ class Board:
                     connected_regions.add(neighbor_region)
 
         return connected_shapes, connected_regions
-
+    
     def _get_absolute_shape_cells(self, shape, top_left_pos):
         """Converte posições relativas da forma em posições absolutas no tabuleiro."""
+        # Use cache for repeated calculations
+        cache_key = (id(shape), top_left_pos)
+        if cache_key in self._shape_cache:
+            return self._shape_cache[cache_key]
+        
         row0, col0 = top_left_pos
         absolute_cells = []
         for i, row in enumerate(shape):
             for j, val in enumerate(row):
                 if val:  # Se a célula está preenchida na forma
                     absolute_cells.append((row0 + i, col0 + j))
+        
+        self._shape_cache[cache_key] = absolute_cells
         return absolute_cells
 
     def calculate_possible_actions(self, region_id):
@@ -405,26 +408,28 @@ class Board:
 
     def verify_graph_connectivity(self):
         """Verifica se o grafo de regiões continua conectado."""
-        region_keys = set(self.regions.keys())
-        if not region_keys:
+        region_keys = list(self.regions.keys())
+        if len(region_keys) <= 1:
             return True
-
-        # BFS/DFS para verificar conectividade
+    
+        # Use iterative DFS instead of recursive
         visited = set()
-        to_visit = [next(iter(region_keys))]
-
-        while to_visit:
-            current = to_visit.pop()
+        stack = [region_keys[0]]
+        
+        while stack:
+            current = stack.pop()
             if current in visited:
                 continue
             visited.add(current)
-            neighbors = self.regions[current]['adjacents']
-            for neighbor in neighbors:
-                if neighbor in region_keys and neighbor not in visited:
-                    to_visit.append(neighbor)
-
-        # Todas as regiões devem ser visitáveis
+            
+            # Add unvisited neighbors to stack
+            for neighbor in self.regions[current]['adjacents']:
+                if neighbor not in visited:
+                    stack.append(neighbor)
+    
+        # All regions must be reachable
         return len(visited) == len(region_keys)
+
 
     def get_value(self, row, col):
         """Obtém o valor numa posição do tabuleiro."""
@@ -442,32 +447,33 @@ class Nuruomino(Problem):
         self.initial = NuruominoState(board)
 
     def get_sorted_actions_from_best_region(self, state: NuruominoState):
-        """Obtém ações ordenadas da melhor região para processar."""
+        """Obtém ações ordenadas da melhor região (most constrained first)."""
         board = state.board
         best_region = None
-        best_score = None
-
-        # Procura região com menor domínio e mais vizinhos não preenchidos
+        min_domain_size = float('inf')
+    
+        # Find region with smallest domain (most constrained first)
         for region_id, region in board.regions.items():
             if region_id in board.finished_regions:
                 continue
-
+    
             domain_size = len(region['domain'])
-            unfilled_neighbors = sum(
-                1 for adj_id in region['adjacents'] if adj_id not in board.finished_regions
-            )
-            # Score: primeiro por tamanho do domínio, depois por vizinhos não preenchidos
-            score = (domain_size, -unfilled_neighbors)
-
-            if best_region is None or score < best_score:
+            if domain_size == 0:
+                continue
+                
+            if domain_size < min_domain_size:
+                min_domain_size = domain_size
                 best_region = region
-                best_score = score
-
+                
+            # If domain size is 1, use immediately (forced move)
+            if domain_size == 1:
+                break
+    
         if best_region is None:
             return []
-
-        # Ordena ações por número de adjacências (menor influência primeiro)
-        return sorted(best_region['domain'], key=lambda action: action.n_adjacent)
+    
+        # Sort by least constraining (fewer adjacents affected)
+        return sorted(best_region['domain'], key=lambda a: a.n_adjacent)
 
     def actions(self, state: NuruominoState):
         """Retorna ações possíveis num estado."""
@@ -503,9 +509,9 @@ def main():
     """Função principal."""
     board = Board.parse_instance()
     
-    # Inicia medição de tempo e memória
-    tracemalloc.start()
-    tic = time.perf_counter()
+    # # Inicia medição de tempo e memória
+    # tracemalloc.start()
+    # tic = time.perf_counter()
 
     state = NuruominoState(board)
     problem = Nuruomino(board)
@@ -515,10 +521,10 @@ def main():
     instrumented = InstrumentedProblem(problem)
     goal_node = depth_first_graph_search(instrumented)
 
-    # Calcula tempo e memória usados
-    toc = time.perf_counter()
-    print(f"  Programa executado em {toc - tic:0.4f} segundos")
-    print(f"  Memória usada: {tracemalloc.get_traced_memory()[1] // 1024} kB")
+    # # Calcula tempo e memória usados
+    # toc = time.perf_counter()
+    # print(f"  Programa executado em {toc - tic:0.4f} segundos")
+    # print(f"  Memória usada: {tracemalloc.get_traced_memory()[1] // 1024} kB")
     
     # Imprime resultado
     if goal_node:
@@ -527,10 +533,4 @@ def main():
         print("Nenhuma solução encontrada.")
 
 if __name__ == "__main__":
-    # Perfil de performance opcional
-    import cProfile
-    import pstats
-    with cProfile.Profile() as pr:
-        main()
-    stats = pstats.Stats(pr)
-    stats.sort_stats("cumulative").print_stats(30)
+    main()
