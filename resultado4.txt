@@ -1,4 +1,4 @@
-  Programa executado em 2.4992 segundos
+  Programa executado em 2.2812 segundos
   Memória usada: 12944 kB
   Nós gerados: 4744
   Nós expandidos: 4731

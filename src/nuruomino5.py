@@ -176,20 +176,6 @@ class Board:
             region.calculate_adjancencies(board_instance)
         return board_instance
     
-    def adjacent_regions(self, region:int) -> list:
-        """Devolve uma lista das regiões que fazem fronteira com a região enviada no argumento."""
-        #TODO
-        pass
-    
-    def adjacent_positions(self, row:int, col:int) -> list:
-        """Devolve as posições adjacentes à região, em todas as direções, incluindo diagonais."""
-        #TODO
-        pass
-
-    def adjacent_values(self, row:int, col:int) -> list:
-        """Devolve os valores das celulas adjacentes à região, em todas as direções, incluindo diagonais."""
-        #TODO
-        pass
 
     def shape_surrowndings(self, shape_name:str, pos:tuple, region_id, initial):
         row, col = pos

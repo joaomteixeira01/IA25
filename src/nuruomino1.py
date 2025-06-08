@@ -6,16 +6,17 @@
 # 97226 João Teixeira 
 # 110094 Francisco Fialho
 
+
 from search import Node, Problem, InstrumentedProblem, depth_first_graph_search
 import copy
 from sys import stdin
 import time
 import tracemalloc
 
-# Pré-computa as direções ortogonais (cima, baixo, esquerda, direita)
+# Pre-compute orthogonal directions
 ORTHOGONAL_DIRS = [(-1,0),(1,0),(0,-1),(0,1)]
 
-# Define as formas das peças como matrizes booleanas
+# Define shapes as boolean matrices (list-of-lists of booleans)
 SHAPES = {
     'L1':  [[True, False],
             [True, False],
@@ -65,18 +66,16 @@ SHAPES = {
 }
 
 class Action:
-    """Representa uma ação: colocar uma peça específica numa posição específica."""
     def __init__(self, shape_name, board_position, region_id):
-        self.shape_name = shape_name          # Nome da forma da peça
-        self.board_position = board_position  # Posição no tabuleiro (linha, coluna)
-        self.region_id = region_id           # ID da região onde colocar
-        self.n_adjacent = 0                  # Número de regiões adjacentes afetadas
+        self.shape_name = shape_name
+        self.board_position = board_position
+        self.region_id = region_id
+        self.n_adjacent = 0
 
     def __repr__(self):
         return f"Action(shape={self.shape_name}, pos={self.board_position}, region={self.region_id})"
 
 class NuruominoState:
-    """Estado do jogo Nuruomino."""
     state_id = 0
 
     def __init__(self, board):
@@ -85,194 +84,178 @@ class NuruominoState:
         NuruominoState.state_id += 1
 
     def __lt__(self, other):
-        """Método usado para desempate na gestão da lista de abertos nas procuras informadas."""
+        """ Este método é utilizado em caso de empate na gestão da lista
+        de abertos nas procuras informadas. """
         return self.id < other.id
 
 class Board:
-    """Representa o tabuleiro do jogo Nuruomino."""
-    
     def __init__(self, board_matrix):
-        """Inicializa o tabuleiro a partir de uma matriz."""
-        self.board = board_matrix                    # Matriz do tabuleiro
-        self.rows = len(board_matrix)               # Número de linhas
-        self.cols = len(board_matrix[0]) if self.rows > 0 else 0  # Número de colunas
-        self.regions = {}                           # Dicionário de regiões
-        self.finished_regions = set()               # Regiões já preenchidas
-        self.invalid = False                        # Flag de estado inválido
-        self.regiao_original = [row[:] for row in board_matrix]  # Cópia do tabuleiro original
+        self.board = board_matrix
+        self.rows = len(board_matrix)
+        self.cols = len(board_matrix[0]) if self.rows > 0 else 0
+        self.regions = {}
+        self.finished_regions = set()
+        self.invalid = False
+        self.regiao_original = [row[:] for row in board_matrix]
 
-        # Identifica e agrupa células por região
         for i in range(self.rows):
             for j in range(self.cols):
                 region_id = board_matrix[i][j]
                 if region_id not in self.regions:
                     self.regions[region_id] = {
-                        'cells': [(i, j)],      # Células da região
-                        'adjacents': set(),     # Regiões adjacentes
-                        'domain': [],           # Ações possíveis
-                        'action': None          # Ação escolhida
+                        'cells': [(i, j)],
+                        'adjacents': set(),
+                        'domain': [],
+                        'action': None
                     }
                 else:
                     self.regions[region_id]['cells'].append((i, j))
 
-        # Calcula ações possíveis e adjacências para cada região
         for rid in self.regions:
             self.calculate_possible_actions(rid)
             self.find_adjacent_regions(rid)
 
+
     @staticmethod
     def parse_instance():
-        """Lê uma instância do problema a partir do stdin."""
         from sys import stdin
         lines = [line.strip() for line in stdin if line.strip()]
         board_matrix = [line.split() for line in lines]
         return Board(board_matrix)
 
     def duplicate_board(self):
-        """Cria uma cópia otimizada do tabuleiro sem chamar __init__."""
-        # Cria nova instância sem chamar o construtor
+        # Create new board instance without calling __init__
         new_board = Board.__new__(Board)
-        
-        # Copia a matriz do tabuleiro (shallow copy)
+
+        # Shallow copy the board matrix (each row list is copied)
         new_board.board = [row[:] for row in self.board]
-        
-        # Copia atributos primitivos
+
+        # Copy primitive attributes
         new_board.rows = self.rows
         new_board.cols = self.cols
         new_board.invalid = self.invalid
-        
-        # Referencia o original imutável (nunca modificado após criação)
+
+        # Reference the immutable original (never modified after creation)
         new_board.regiao_original = self.regiao_original
-        
-        # Cópia otimizada das regiões
+
+        # Optimized region copying: reuse immutable cells, copy sets and lists
         new_board.regions = {}
         for region_id, info in self.regions.items():
             new_board.regions[region_id] = {
-                'cells': info['cells'],          # Tuplos são imutáveis
-                'adjacents': set(info['adjacents']),  # Precisa de novo conjunto
-                'domain': info['domain'][:],    # Shallow copy é suficiente
-                'action': info['action']        # Imutável (None ou Action)
+                'cells': info['cells'],                # immutable tuples, safe to share
+                'adjacents': set(info['adjacents']),  # copy set
+                'domain': info['domain'][:],          # copy domain list
+                'action': info['action']              # None or Action (immutable)
             }
-        
-        # Copia regiões terminadas
+
+        # Copy finished regions
         new_board.finished_regions = set(self.finished_regions)
-        
+
         return new_board
 
+
     def find_adjacent_regions(self, id_regiao):
-        """Encontra todas as regiões adjacentes a uma região específica."""
         region = self.regions[id_regiao]
         for (linha, coluna) in region['cells']:
-            # Verifica as 4 direções ortogonais
             for (dl, dc) in ORTHOGONAL_DIRS:
                 ni, nj = linha + dl, coluna + dc
-                # Se está dentro dos limites e é uma região diferente
                 if 0 <= ni < self.rows and 0 <= nj < self.cols:
                     adj_id = self.board[ni][nj]
                     if adj_id != id_regiao:
                         region['adjacents'].add(adj_id)
 
+    
     def piece_adjacents(self, shape_name, position, region_id, original):
-        """Determina que regiões ficam adjacentes a uma peça colocada numa posição."""
         shape = SHAPES[shape_name]
         cells = self._get_absolute_shape_cells(shape, position)
-        
-        connected_shapes = set()  # Regiões com peças já colocadas
-        connected_regions = set() # Todas as regiões adjacentes
 
-        # Para cada célula da peça
-        for row, col in cells:
-            # Verifica os 4 vizinhos ortogonais
-            for dr, dc in ORTHOGONAL_DIRS:
-                nr = row + dr
-                nc = col + dc
+        connected_shapes = set()
+        connected_regions = set()
+
+        # For each cell of the placed shape, check orthogonal neighbors
+        for (row, col) in cells:
+            for (dr, dc) in ORTHOGONAL_DIRS:
+                nr, nc = row + dr, col + dc
                 if 0 <= nr < self.rows and 0 <= nc < self.cols:
-                    neighbor_val = self.board[nr][nc]      # Valor atual no tabuleiro
-                    neighbor_region = original[nr][nc]     # Região original
-                    if neighbor_region == region_id:      # Ignora a própria região
+                    neighbor_val = self.board[nr][nc]
+                    neighbor_region = original[nr][nc]
+                    # Skip same region
+                    if neighbor_region == region_id:
                         continue
-                    # Se é uma peça diferente já colocada
+                    # If neighbor cell is a letter and not the same shape letter, record shape adjacency
                     if neighbor_val.isalpha() and neighbor_val != shape_name[0]:
                         connected_shapes.add(neighbor_region)
+                    # Always record region adjacency
                     connected_regions.add(neighbor_region)
 
         return connected_shapes, connected_regions
 
     def _get_absolute_shape_cells(self, shape, top_left_pos):
-        """Converte posições relativas da forma em posições absolutas no tabuleiro."""
         row0, col0 = top_left_pos
         absolute_cells = []
         for i, row in enumerate(shape):
             for j, val in enumerate(row):
-                if val:  # Se a célula está preenchida na forma
+                if val:
                     absolute_cells.append((row0 + i, col0 + j))
         return absolute_cells
 
+
     def calculate_possible_actions(self, region_id):
-        """Calcula todas as ações possíveis para uma região."""
         region = self.regions[region_id]
-        # Tenta todas as formas
         for shape_name in SHAPES:
-            # Em todas as células da região
             for cell in region['cells']:
                 self._try_place_shape(shape_name, cell, region_id)
 
+
     def _try_place_shape(self, shape_name, cell, region_id):
-        """Tenta colocar uma forma específica usando uma célula como âncora."""
         shape = SHAPES[shape_name]
-        anchor = self._find_anchor(shape)  # Primeira célula preenchida da forma
+        anchor = self._find_anchor(shape)
         if anchor is None:
             return
-        
         ai, aj = anchor
         base_i, base_j = cell
-        # Calcula posição superior-esquerda da forma
         top_i = base_i - ai
         top_j = base_j - aj
-        
-        # Verifica se cabe no tabuleiro e na região
         if not self._shape_within_bounds(shape, top_i, top_j):
             return
         if not self._shape_fits_region(shape, top_i, top_j, region_id):
             return
-        
-        # Cria ação e calcula influência
         action = Action(shape_name, (top_i, top_j), region_id)
         _, connected = self.piece_adjacents(shape_name, (top_i, top_j), region_id, self.regiao_original)
         action.influence_count = len(connected)
         self.regions[region_id]['domain'].append(action)
+        if not self.validate_placement_rules(shape_name, (top_i, top_j)):
+            return  # Don’t add invalid actions to domain
+
 
     def _find_anchor(self, shape):
-        """Encontra a primeira célula preenchida de uma forma (âncora)."""
         for i, row in enumerate(shape):
             for j, val in enumerate(row):
                 if val:
                     return (i, j)
         return None
 
+
     def _shape_within_bounds(self, shape, row, col):
-        """Verifica se uma forma cabe dentro dos limites do tabuleiro."""
         return 0 <= row and 0 <= col and row + len(shape) <= self.rows and col + len(shape[0]) <= self.cols
 
     def _shape_fits_region(self, shape, top_i, top_j, region_id):
-        """Verifica se uma forma cabe inteiramente dentro de uma região."""
         for i, row in enumerate(shape):
             for j, filled in enumerate(row):
-                if filled:
-                    if self.board[top_i + i][top_j + j] != region_id:
-                        return False
+                if filled and self.board[top_i + i][top_j + j] != region_id:
+                    return False
         return True
 
     def validate_placement_rules(self, shape_name, position):
-        """Valida se colocar uma peça numa posição respeita as regras do jogo."""
+        # Check no identical shapes touch
         if self._touches_identical_piece(shape_name, position):
-            return False  # Não pode tocar em peça idêntica
+            return False
+        # Check no 2x2 block is formed
         if self.detect_create_2x2_block(shape_name, position):
-            return False  # Não pode criar bloco 2x2
+            return False
         return True
 
     def _touches_identical_piece(self, shape_name, position):
-        """Verifica se uma peça tocaria numa peça idêntica."""
         shape = SHAPES[shape_name]
         base_row, base_col = position
 
@@ -282,254 +265,181 @@ class Board:
                     continue
                 cell_row = base_row + i
                 cell_col = base_col + j
-                # Verifica vizinhos ortogonais em linha
+                # Check four orthogonal neighbors for same letter
                 for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
-                    neighbor_row = cell_row + dr
-                    neighbor_col = cell_col + dc
-                    if 0 <= neighbor_row < self.rows and 0 <= neighbor_col < self.cols:
-                        if self.board[neighbor_row][neighbor_col] == shape_name[0]:
+                    nr, nc = cell_row + dr, cell_col + dc
+                    if 0 <= nr < self.rows and 0 <= nc < self.cols:
+                        if self.board[nr][nc] == shape_name[0]:
                             return True
         return False
 
     def detect_create_2x2_block(self, shape_name, position):
-        """Deteta se colocar uma peça criaria um bloco 2x2 preenchido."""
+        # New shape cells (letter placed) may form a new 2x2 block
         shape = SHAPES[shape_name]
-        top_row, left_col = position
-        # Calcula área onde procurar blocos 2x2
-        r_start, r_end, c_start, c_end = self._get_block_area_bounds(top_row, left_col, shape)
-
-        # Verifica cada posição possível de um bloco 2x2
-        for r in range(r_start, r_end):
-            for c in range(c_start, c_end):
-                if r + 1 < self.rows and c + 1 < self.cols:
-                    if self._is_full_filled_square(r, c, shape_name, position, shape):
-                        return True
+        base_row, base_col = position
+        # For each cell of the shape, check 2x2 including that cell
+        for i, row in enumerate(shape):
+            for j, filled in enumerate(row):
+                if not filled:
+                    continue
+                r, c = base_row + i, base_col + j
+                # Check the four possible 2x2 blocks that include (r,c)
+                for dr in (0, -1):
+                    for dc in (0, -1):
+                        top_r, top_c = r + dr, c + dc
+                        # Ensure within grid for a 2x2 block
+                        if (0 <= top_r < self.rows - 1) and (0 <= top_c < self.cols - 1):
+                            # Check all four cells of the block
+                            if (self.board[top_r][top_c].isalpha() and
+                                self.board[top_r+1][top_c].isalpha() and
+                                self.board[top_r][top_c+1].isalpha() and
+                                self.board[top_r+1][top_c+1].isalpha()):
+                                return True
         return False
 
-    def _get_block_area_bounds(self, row, col, shape):
-        """Calcula os limites da área onde procurar blocos 2x2."""
-        height = len(shape)
-        width = len(shape[0])
-        # Área de busca: uma célula antes da peça até uma célula depois
-        r_start = max(0, row - 1)
-        r_end = min(self.rows - 1, row + height)
-        c_start = max(0, col - 1)
-        c_end = min(self.cols - 1, col + width)
-        return r_start, r_end, c_start, c_end
-
-    def _is_full_filled_square(self, r, c, shape_name, position, shape):
-        """Verifica se um quadrado 2x2 específico ficaria totalmente preenchido."""
-        top_row, left_col = position
-        # Verifica as 4 células do quadrado 2x2
-        for dr in (0, 1):
-            for dc in (0, 1):
-                i = r + dr
-                j = c + dc
-                cell_val = self.board[i][j]
-                # Se é uma célula vazia (região)
-                if cell_val.isdigit():
-                    # Verifica se seria preenchida pela nova peça
-                    if top_row <= i < top_row + len(shape) and left_col <= j < left_col + len(shape[0]):
-                        si = i - top_row
-                        sj = j - left_col
-                        if not shape[si][sj]:  # Se a peça não preencheria esta célula
-                            return False
-                    else:  # Célula fora da peça, ficaria vazia
-                        return False
-        return True
-
     def remove_connection(self, region_a, region_b):
-        """Remove a conexão entre duas regiões."""
         self.regions[region_a]["adjacents"].discard(region_b)
         if region_b in self.regions:
-            adjacent_set = self.regions[region_b]["adjacents"]
-            if region_a in adjacent_set:
-                adjacent_set.remove(region_a)
+            self.regions[region_b]["adjacents"].discard(region_a)
 
     def restrict_action_domain(self, region_id):
-        """Restringe o domínio de ações de uma região baseado nas regras."""
         region_info = self.regions[region_id]
-        updated_domain = []
-        # Filtra apenas ações que respeitam as regras
-        for candidate_action in region_info["domain"]:
-            if self.validate_placement_rules(candidate_action.shape_name, candidate_action.board_position):
-                updated_domain.append(candidate_action)
-        # Se não há ações válidas e região não tem peça, estado é inválido
+        # Filter domain with list comprehension (faster than manual loop):contentReference[oaicite:7]{index=7}
+        updated_domain = [
+            action for action in region_info["domain"]
+            if self.validate_placement_rules(action.shape_name, action.board_position)
+        ]
+        region_info["domain"] = updated_domain
+        # If no action is set and domain is empty, mark invalid
         if region_info["action"] is None and not updated_domain:
             self.invalid = True
-        region_info["domain"] = updated_domain
 
     def apply_restrictions(self, action: Action, initial_board):
-        """Aplica restrições após colocar uma peça."""
         region_id = action.region_id
         self.regions[region_id]['action'] = action
 
-        # Determina que regiões ficam conectadas
         shapes_touching, regions_touching = self.piece_adjacents(
             action.shape_name, action.board_position, region_id, initial_board
         )
 
         adjacent_ids = list(self.regions[region_id]['adjacents'])
-        # Determina que conexões devem ser cortadas
         to_disconnect = self._determine_disconnections(adjacent_ids, shapes_touching, regions_touching)
 
-        # Restringe domínios das regiões que continuam conectadas
+        # Restrict neighbors' domains
         for neighbor_id in adjacent_ids:
             if neighbor_id not in to_disconnect and neighbor_id not in self.finished_regions:
                 self.restrict_action_domain(neighbor_id)
+                if self.invalid:
+                    break  # early exit if already invalid
 
-        # Remove conexões cortadas
-        self._remove_disconnected_neighbors(region_id, to_disconnect)
-
-        # Verifica se o grafo continua conectado
-        if not self.verify_graph_connectivity():
-            self.invalid = True
+        # Remove disconnected neighbors
+        if to_disconnect:
+            self._remove_disconnected_neighbors(region_id, to_disconnect)
+            # Check connectivity only if something changed
+            if not self.verify_graph_connectivity():
+                self.invalid = True
 
     def _determine_disconnections(self, neighbors, connected_shapes, connected_regions):
-        """Determina que regiões devem ser desconectadas."""
         cut_list = []
         for nid in neighbors:
             region_data = self.regions[nid]
-            # Se região não tem peça e não está adjacente à nova peça
             if region_data['action'] is None and nid not in connected_regions:
                 cut_list.append(nid)
-            # Se região tem peça mas não toca na nova peça
             elif region_data['action'] is not None and nid not in connected_shapes:
                 cut_list.append(nid)
         return cut_list
 
     def _remove_disconnected_neighbors(self, region_id, cut_list):
-        """Remove conexões com regiões desconectadas."""
         for nid in cut_list:
             self.remove_connection(region_id, nid)
 
     def verify_graph_connectivity(self):
-        """Verifica se o grafo de regiões continua conectado."""
         region_keys = set(self.regions.keys())
         if not region_keys:
             return True
-
-        # BFS/DFS para verificar conectividade
         visited = set()
-        to_visit = [next(iter(region_keys))]
-
-        while to_visit:
-            current = to_visit.pop()
+        stack = [next(iter(region_keys))]
+        while stack:
+            current = stack.pop()
             if current in visited:
                 continue
             visited.add(current)
-            neighbors = self.regions[current]['adjacents']
-            for neighbor in neighbors:
+            for neighbor in self.regions[current]['adjacents']:
                 if neighbor in region_keys and neighbor not in visited:
-                    to_visit.append(neighbor)
-
-        # Todas as regiões devem ser visitáveis
+                    stack.append(neighbor)
         return len(visited) == len(region_keys)
 
     def get_value(self, row, col):
-        """Obtém o valor numa posição do tabuleiro."""
         return self.board[row][col]
 
     def print_instance(self):
-        """Imprime o tabuleiro formatado."""
-        output = '\n'.join('\t'.join(map(str,row)) for row in self.board)
-        print(output, end='')
+        print("\n".join("\t".join(map(str, row)) for row in self.board), end='')
 
 class Nuruomino(Problem):
-    """Classe principal do problema Nuruomino."""
-    
     def __init__(self, board: Board):
         self.initial = NuruominoState(board)
 
     def get_sorted_actions_from_best_region(self, state: NuruominoState):
-        """Obtém ações ordenadas da melhor região para processar."""
         board = state.board
         best_region = None
         best_score = None
-
-        # Procura região com menor domínio e mais vizinhos não preenchidos
         for region_id, region in board.regions.items():
             if region_id in board.finished_regions:
                 continue
-
             domain_size = len(region['domain'])
             unfilled_neighbors = sum(
                 1 for adj_id in region['adjacents'] if adj_id not in board.finished_regions
             )
-            # Score: primeiro por tamanho do domínio, depois por vizinhos não preenchidos
             score = (domain_size, -unfilled_neighbors)
-
             if best_region is None or score < best_score:
                 best_region = region
                 best_score = score
-
         if best_region is None:
             return []
-
-        # Ordena ações por número de adjacências (menor influência primeiro)
-        return sorted(best_region['domain'], key=lambda action: action.n_adjacent)
+        return sorted(best_region['domain'], key=lambda action: action.influence_count)
 
     def actions(self, state: NuruominoState):
-        """Retorna ações possíveis num estado."""
-        board = state.board
-        if board.invalid:
-            return []  # Estado inválido, sem ações possíveis
+        if state.board.invalid:
+            return []
         return self.get_sorted_actions_from_best_region(state)
 
     def result(self, state: NuruominoState, action: Action):
-        """Aplica uma ação e retorna o novo estado."""
         original_board = state.board
         new_board = original_board.duplicate_board()
         shape = SHAPES[action.shape_name]
-        anchor_row, anchor_col = action.board_position
-
-        # Coloca a peça no tabuleiro
+        r0, c0 = action.board_position
         for dx, row in enumerate(shape):
             for dy, filled in enumerate(row):
                 if filled:
-                    new_board.board[anchor_row + dx][anchor_col + dy] = action.shape_name[0]
-
-        # Aplica restrições e marca região como terminada
+                    new_board.board[r0 + dx][c0 + dy] = action.shape_name[0]
         new_board.apply_restrictions(action, self.initial.board.board)
         new_board.finished_regions.add(action.region_id)
-
         return NuruominoState(new_board)
 
     def goal_test(self, state: NuruominoState):
-        """Testa se um estado é objetivo (todas as regiões preenchidas e válidas)."""
-        return (len(state.board.finished_regions) == len(state.board.regions) and not state.board.invalid)
+        return (len(state.board.finished_regions) == len(state.board.regions)
+                and not state.board.invalid)
+
 
 def main():
-    """Função principal."""
     board = Board.parse_instance()
-    
-    # Inicia medição de tempo e memória
     tracemalloc.start()
     tic = time.perf_counter()
-
     state = NuruominoState(board)
     problem = Nuruomino(board)
     problem.initial = state
-
-    # Resolve o problema usando procura em profundidade
     instrumented = InstrumentedProblem(problem)
     goal_node = depth_first_graph_search(instrumented)
-
-    # Calcula tempo e memória usados
     toc = time.perf_counter()
     print(f"  Programa executado em {toc - tic:0.4f} segundos")
     print(f"  Memória usada: {tracemalloc.get_traced_memory()[1] // 1024} kB")
-    
-    # Imprime resultado
     if goal_node:
         goal_node.state.board.print_instance()
     else:
         print("Nenhuma solução encontrada.")
 
 if __name__ == "__main__":
-    # Perfil de performance opcional
-    import cProfile
-    import pstats
+    import cProfile, pstats
     with cProfile.Profile() as pr:
         main()
     stats = pstats.Stats(pr)

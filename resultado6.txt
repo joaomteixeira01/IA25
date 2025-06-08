@@ -1,5 +1,5 @@
-  Programa executado em 0.0000 segundos
-  Memória usada: 0 kB
+  Programa executado em 305.6804 segundos
+  Memória usada: 1532 kB
 1	1	2	2	I	I	I	I	2	2	3	I
 L	L	2	L	L	4	5	L	L	2	6	I
 L	7	7	L	8	4	5	9	L	6	6	I
