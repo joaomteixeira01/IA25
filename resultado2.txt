@@ -1,3 +1,5 @@
+  Programa executado em 29.3236 segundos
+  Memória usada: 1540600 kB
 1	1	2	2	I	I	I	I	2	2	3	I
 L	L	2	L	L	4	5	L	L	2	6	I
 L	7	7	L	8	4	5	9	L	6	6	I

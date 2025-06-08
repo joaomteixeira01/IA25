@@ -9,8 +9,6 @@
 from search import Node, Problem, InstrumentedProblem, depth_first_graph_search
 import copy
 from sys import stdin
-import time
-import tracemalloc
 
 # Pré-computa as direções ortogonais (cima, baixo, esquerda, direita)
 ORTHOGONAL_DIRS = [(-1,0),(1,0),(0,-1),(0,1)]
@@ -100,7 +98,7 @@ class Board:
         self.finished_regions = set()               # Regiões já preenchidas
         self.invalid = False                        # Flag de estado inválido
         self.regiao_original = [row[:] for row in board_matrix]  # Cópia do tabuleiro original
-        self._shape_cache = {}  # Cache for expensive calculations
+        self._shape_cache = {}  #Cache para posições absolutas de formas
 
         # Identifica e agrupa células por região
         for i in range(self.rows):
@@ -111,7 +109,7 @@ class Board:
                         'cells': [(i, j)],      # Células da região
                         'adjacents': set(),     # Regiões adjacentes
                         'domain': [],           # Ações possíveis
-                        'action': None          # Ação escolhida
+                        'action': None          # Ação escolhida      
                     }
                 else:
                     self.regions[region_id]['cells'].append((i, j))
@@ -121,6 +119,7 @@ class Board:
             self.calculate_possible_actions(rid)
             self.find_adjacent_regions(rid)
 
+
     @staticmethod
     def parse_instance():
         """Lê uma instância do problema a partir do stdin."""
@@ -129,26 +128,27 @@ class Board:
         board_matrix = [line.split() for line in lines]
         return Board(board_matrix)
 
+
     def duplicate_board(self):
         """Cria uma cópia otimizada do tabuleiro."""
         new_board = Board.__new__(Board)
         
-        # Copy matrix more efficiently
+        # Copia a matriz do tabuleiro 
         new_board.board = [row[:] for row in self.board]
         new_board.rows = self.rows
         new_board.cols = self.cols
         new_board.invalid = self.invalid
-        new_board.regiao_original = self.regiao_original  # Immutable reference
-        new_board._shape_cache = {}  # Initialize cache for new board
+        new_board.regiao_original = self.regiao_original  
+        new_board._shape_cache = {}  # Cache para posições absolutas de formas
         
-        # Optimize regions copy - avoid deep copying unchanged data
+        # Copia as regiões 
         new_board.regions = {}
         for region_id, info in self.regions.items():
             new_board.regions[region_id] = {
-                'cells': info['cells'],  # Immutable list of tuples
-                'adjacents': info['adjacents'].copy(),  # Only this changes
-                'domain': info['domain'],  # Share reference until modified
-                'action': info['action']  # Immutable
+                'cells': info['cells'],  
+                'adjacents': info['adjacents'].copy(),  
+                'domain': info['domain'],  
+                'action': info['action']  
             }
         
         new_board.finished_regions = self.finished_regions.copy()
@@ -168,6 +168,7 @@ class Board:
                     if adj_id != id_regiao:
                         region['adjacents'].add(adj_id)
 
+
     def piece_adjacents(self, shape_name, position, region_id, original):
         """Determina que regiões ficam adjacentes a uma peça colocada numa posição."""
         shape = SHAPES[shape_name]
@@ -185,7 +186,7 @@ class Board:
                 if 0 <= nr < self.rows and 0 <= nc < self.cols:
                     neighbor_val = self.board[nr][nc]      # Valor atual no tabuleiro
                     neighbor_region = original[nr][nc]     # Região original
-                    if neighbor_region == region_id:      # Ignora a própria região
+                    if neighbor_region == region_id:      # Ignora a própria região     
                         continue
                     # Se é uma peça diferente já colocada
                     if neighbor_val.isalpha() and neighbor_val != shape_name[0]:
@@ -194,9 +195,10 @@ class Board:
 
         return connected_shapes, connected_regions
     
+
     def _get_absolute_shape_cells(self, shape, top_left_pos):
         """Converte posições relativas da forma em posições absolutas no tabuleiro."""
-        # Use cache for repeated calculations
+        # Usa cache para evitar recálculos repetidos
         cache_key = (id(shape), top_left_pos)
         if cache_key in self._shape_cache:
             return self._shape_cache[cache_key]
@@ -205,11 +207,12 @@ class Board:
         absolute_cells = []
         for i, row in enumerate(shape):
             for j, val in enumerate(row):
-                if val:  # Se a célula está preenchida na forma
+                if val:  
                     absolute_cells.append((row0 + i, col0 + j))
         
         self._shape_cache[cache_key] = absolute_cells
         return absolute_cells
+
 
     def calculate_possible_actions(self, region_id):
         """Calcula todas as ações possíveis para uma região."""
@@ -220,10 +223,11 @@ class Board:
             for cell in region['cells']:
                 self._try_place_shape(shape_name, cell, region_id)
 
+
     def _try_place_shape(self, shape_name, cell, region_id):
         """Tenta colocar uma forma específica usando uma célula como âncora."""
         shape = SHAPES[shape_name]
-        anchor = self._find_anchor(shape)  # Primeira célula preenchida da forma
+        anchor = self._find_anchor(shape)  
         if anchor is None:
             return
         
@@ -245,6 +249,7 @@ class Board:
         action.influence_count = len(connected)
         self.regions[region_id]['domain'].append(action)
 
+
     def _find_anchor(self, shape):
         """Encontra a primeira célula preenchida de uma forma (âncora)."""
         for i, row in enumerate(shape):
@@ -253,9 +258,11 @@ class Board:
                     return (i, j)
         return None
 
+
     def _shape_within_bounds(self, shape, row, col):
         """Verifica se uma forma cabe dentro dos limites do tabuleiro."""
         return 0 <= row and 0 <= col and row + len(shape) <= self.rows and col + len(shape[0]) <= self.cols
+
 
     def _shape_fits_region(self, shape, top_i, top_j, region_id):
         """Verifica se uma forma cabe inteiramente dentro de uma região."""
@@ -266,13 +273,15 @@ class Board:
                         return False
         return True
 
+
     def validate_placement_rules(self, shape_name, position):
         """Valida se colocar uma peça numa posição respeita as regras do jogo."""
         if self._touches_identical_piece(shape_name, position):
-            return False  # Não pode tocar em peça idêntica
+            return False  
         if self.detect_create_2x2_block(shape_name, position):
-            return False  # Não pode criar bloco 2x2
+            return False  
         return True
+
 
     def _touches_identical_piece(self, shape_name, position):
         """Verifica se uma peça tocaria numa peça idêntica."""
@@ -285,7 +294,7 @@ class Board:
                     continue
                 cell_row = base_row + i
                 cell_col = base_col + j
-                # Verifica vizinhos ortogonais em linha
+                # Verifica vizinhos ortogonais
                 for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
                     neighbor_row = cell_row + dr
                     neighbor_col = cell_col + dc
@@ -293,6 +302,7 @@ class Board:
                         if self.board[neighbor_row][neighbor_col] == shape_name[0]:
                             return True
         return False
+
 
     def detect_create_2x2_block(self, shape_name, position):
         """Deteta se colocar uma peça criaria um bloco 2x2 preenchido."""
@@ -309,6 +319,7 @@ class Board:
                         return True
         return False
 
+
     def _get_block_area_bounds(self, row, col, shape):
         """Calcula os limites da área onde procurar blocos 2x2."""
         height = len(shape)
@@ -319,6 +330,7 @@ class Board:
         c_start = max(0, col - 1)
         c_end = min(self.cols - 1, col + width)
         return r_start, r_end, c_start, c_end
+
 
     def _is_full_filled_square(self, r, c, shape_name, position, shape):
         """Verifica se um quadrado 2x2 específico ficaria totalmente preenchido."""
@@ -335,11 +347,12 @@ class Board:
                     if top_row <= i < top_row + len(shape) and left_col <= j < left_col + len(shape[0]):
                         si = i - top_row
                         sj = j - left_col
-                        if not shape[si][sj]:  # Se a peça não preencheria esta célula
+                        if not shape[si][sj]:  
                             return False
-                    else:  # Célula fora da peça, ficaria vazia
+                    else:  
                         return False
         return True
+
 
     def remove_connection(self, region_a, region_b):
         """Remove a conexão entre duas regiões."""
@@ -348,6 +361,7 @@ class Board:
             adjacent_set = self.regions[region_b]["adjacents"]
             if region_a in adjacent_set:
                 adjacent_set.remove(region_a)
+
 
     def restrict_action_domain(self, region_id):
         """Restringe o domínio de ações de uma região baseado nas regras."""
@@ -361,6 +375,7 @@ class Board:
         if region_info["action"] is None and not updated_domain:
             self.invalid = True
         region_info["domain"] = updated_domain
+
 
     def apply_restrictions(self, action: Action, initial_board):
         """Aplica restrições após colocar uma peça."""
@@ -388,6 +403,7 @@ class Board:
         if not self.verify_graph_connectivity():
             self.invalid = True
 
+
     def _determine_disconnections(self, neighbors, connected_shapes, connected_regions):
         """Determina que regiões devem ser desconectadas."""
         cut_list = []
@@ -401,10 +417,12 @@ class Board:
                 cut_list.append(nid)
         return cut_list
 
+
     def _remove_disconnected_neighbors(self, region_id, cut_list):
         """Remove conexões com regiões desconectadas."""
         for nid in cut_list:
             self.remove_connection(region_id, nid)
+
 
     def verify_graph_connectivity(self):
         """Verifica se o grafo de regiões continua conectado."""
@@ -412,7 +430,7 @@ class Board:
         if len(region_keys) <= 1:
             return True
     
-        # Use iterative DFS instead of recursive
+        # Usa DFS iterativo em vez de recursivo para evitar stack overflow
         visited = set()
         stack = [region_keys[0]]
         
@@ -422,12 +440,12 @@ class Board:
                 continue
             visited.add(current)
             
-            # Add unvisited neighbors to stack
+            # Adiciona vizinhos não visitados à pilha
             for neighbor in self.regions[current]['adjacents']:
                 if neighbor not in visited:
                     stack.append(neighbor)
     
-        # All regions must be reachable
+        # Todas as regiões devem ser alcançáveis
         return len(visited) == len(region_keys)
 
 
@@ -435,10 +453,12 @@ class Board:
         """Obtém o valor numa posição do tabuleiro."""
         return self.board[row][col]
 
+
     def print_instance(self):
         """Imprime o tabuleiro formatado."""
         output = '\n'.join('\t'.join(map(str,row)) for row in self.board)
         print(output, end='')
+
 
 class Nuruomino(Problem):
     """Classe principal do problema Nuruomino."""
@@ -446,13 +466,14 @@ class Nuruomino(Problem):
     def __init__(self, board: Board):
         self.initial = NuruominoState(board)
 
+
     def get_sorted_actions_from_best_region(self, state: NuruominoState):
-        """Obtém ações ordenadas da melhor região (most constrained first)."""
+        """Obtém ações ordenadas da melhor região (mais restringida primeiro)."""
         board = state.board
         best_region = None
         min_domain_size = float('inf')
     
-        # Find region with smallest domain (most constrained first)
+        # Encontra região com menor domínio (mais restringida primeiro)
         for region_id, region in board.regions.items():
             if region_id in board.finished_regions:
                 continue
@@ -465,22 +486,24 @@ class Nuruomino(Problem):
                 min_domain_size = domain_size
                 best_region = region
                 
-            # If domain size is 1, use immediately (forced move)
+            # Se o domínio tem tamanho 1, usar imediatamente (movimento forçado)
             if domain_size == 1:
                 break
     
         if best_region is None:
             return []
     
-        # Sort by least constraining (fewer adjacents affected)
+        # Ordena por menor influência (menos restritivo primeiro)
         return sorted(best_region['domain'], key=lambda a: a.n_adjacent)
+
 
     def actions(self, state: NuruominoState):
         """Retorna ações possíveis num estado."""
         board = state.board
         if board.invalid:
-            return []  # Estado inválido, sem ações possíveis
+            return []  
         return self.get_sorted_actions_from_best_region(state)
+
 
     def result(self, state: NuruominoState, action: Action):
         """Aplica uma ação e retorna o novo estado."""
@@ -501,15 +524,19 @@ class Nuruomino(Problem):
 
         return NuruominoState(new_board)
 
+
     def goal_test(self, state: NuruominoState):
         """Testa se um estado é objetivo (todas as regiões preenchidas e válidas)."""
         return (len(state.board.finished_regions) == len(state.board.regions) and not state.board.invalid)
+    
 
 def main():
     """Função principal."""
     board = Board.parse_instance()
     
-    # # Inicia medição de tempo e memória
+    # import tracemalloc
+    # import time
+    # # # Inicia medição de tempo e memória
     # tracemalloc.start()
     # tic = time.perf_counter()
 
