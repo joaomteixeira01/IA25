@@ -23,3 +23,21 @@ The solution is achieved using **depth-first search** combined with **forward ch
 **Command to run the project**  
 ```bash
 python3 src/nuruomino.py < public-tests/test04.txt  # Example: runs public test 4
+```
+***NOTE: Requires Python 3.7+***
+
+---
+**Project structure**
+```bash
+.
+├── public-tests/           # Provided test cases (.txt input and .out expected output)
+│   ├── imagens/            # Visual representations of test cases
+│   ├── testXX.txt          # Input files
+│   └── testXX.out          # Expected output files
+├── src/
+│   ├── nuruomino.py        # Main file containing puzzle-solving logic
+│   ├── search.py           # Implementation of search algorithms
+│   └── utils.py            # Auxiliary functions 
+├── tests/                  # Additional test cases 
+├── .gitignore
+└── IA_24_25__Projeto_Nuruomino_2_Maio.pdf  # Original project description (in Portuguese)
