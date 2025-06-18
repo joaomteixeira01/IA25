@@ -1,5 +1,4 @@
-# Nuruomino
-## AI Project 2024/2025
+# Nuruomino - AI Project 2024/2025
 
 This repository contains the implementation of an automatic solver for the **Nuruomino** puzzle, developed as part of the **Artificial Intelligence** course (2024/2025 academic year).
 
